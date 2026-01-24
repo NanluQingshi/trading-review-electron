@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input } from 'antd';
+import type { FormInstance } from 'antd/es/form';
 import { Method } from '../../types';
 
 interface MethodFormValues {
@@ -44,7 +45,7 @@ const MethodModal: React.FC<MethodModalProps> = ({
       onCancel={onCancel}
       okText="保存"
       cancelText="取消"
-      destroyOnClose
+      destroyOnHidden
       confirmLoading={confirmLoading}
     >
       <Form form={form} layout="vertical" style={{ marginTop: 24 }}>
