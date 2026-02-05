@@ -73,14 +73,14 @@ export const getOverallStats = () => {
 
     // 获取盈利、亏损、保本的交易数量
     const winResult = db
-      .prepare('SELECT COUNT(*) as count FROM trades WHERE result = "win"')
+      .prepare("SELECT COUNT(*) as count FROM trades WHERE result = 'win'")
       .get();
     const lossResult = db
-      .prepare('SELECT COUNT(*) as count FROM trades WHERE result = "loss"')
+      .prepare("SELECT COUNT(*) as count FROM trades WHERE result = 'loss'")
       .get();
     const breakevenResult = db
       .prepare(
-        'SELECT COUNT(*) as count FROM trades WHERE result = "breakeven"',
+        "SELECT COUNT(*) as count FROM trades WHERE result = 'breakeven'",
       )
       .get();
 
@@ -113,11 +113,11 @@ export const getOverallStats = () => {
 
     // 计算盈利因子
     const totalWinAmountResult = db
-      .prepare('SELECT SUM(profit) as total FROM trades WHERE result = "win"')
+      .prepare("SELECT SUM(profit) as total FROM trades WHERE result = 'win'")
       .get();
     const totalLossAmountResult = db
       .prepare(
-        'SELECT SUM(ABS(profit)) as total FROM trades WHERE result = "loss"',
+        "SELECT SUM(ABS(profit)) as total FROM trades WHERE result = 'loss'",
       )
       .get();
 
@@ -138,6 +138,29 @@ export const getOverallStats = () => {
       ((holdingTimeResult?.avg || 0) * 100) / 100,
     );
 
+    // 计算总预期盈亏和平均预期盈亏
+    const expectedProfitResult = db
+      .prepare(
+        "SELECT SUM(expectedProfit) as total, AVG(expectedProfit) as avg FROM trades WHERE expectedProfit IS NOT NULL",
+      )
+      .get();
+    const totalExpectedProfit =
+      Math.round((expectedProfitResult?.total || 0) * 100) / 100;
+    const avgExpectedProfit =
+      Math.round((expectedProfitResult?.avg || 0) * 100) / 100;
+
+    // 计算平均盈利和平均亏损
+    const avgWinResult = db
+      .prepare("SELECT AVG(profit) as avg FROM trades WHERE result = 'win'")
+      .get();
+    const avgLossResult = db
+      .prepare(
+        "SELECT AVG(ABS(profit)) as avg FROM trades WHERE result = 'loss'",
+      )
+      .get();
+    const avgWin = Math.round((avgWinResult?.avg || 0) * 100) / 100;
+    const avgLoss = Math.round((avgLossResult?.avg || 0) * 100) / 100;
+
     return {
       success: true,
       data: {
@@ -152,6 +175,10 @@ export const getOverallStats = () => {
         maxLoss,
         profitFactor,
         averageHoldingTime,
+        totalExpectedProfit,
+        avgExpectedProfit,
+        avgWin,
+        avgLoss,
       },
     };
   } catch (error) {
@@ -175,6 +202,7 @@ export const getMethodStats = () => {
         COUNT(t.id) as totalTrades,
         SUM(CASE WHEN t.result = 'win' THEN 1 ELSE 0 END) as winCount,
         SUM(t.profit) as totalProfit,
+        SUM(t.expectedProfit) as totalExpectedProfit,
         SUM(CASE WHEN t.result = 'win' THEN t.profit ELSE 0 END) as totalWinAmount,
         SUM(CASE WHEN t.result = 'loss' THEN ABS(t.profit) ELSE 0 END) as totalLossAmount
       FROM 
@@ -207,8 +235,10 @@ export const getMethodStats = () => {
         methodId: row.methodId,
         methodName: row.methodName,
         totalTrades: row.totalTrades,
+        winCount: row.winCount || 0,
         winRate,
         totalProfit: row.totalProfit || 0,
+        totalExpectedProfit: row.totalExpectedProfit || 0,
         averageProfit,
         profitFactor,
       };
@@ -237,7 +267,8 @@ export const getSymbolStats = () => {
         symbol,
         COUNT(*) as totalTrades,
         SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) as winCount,
-        SUM(profit) as totalProfit
+        SUM(profit) as totalProfit,
+        SUM(expectedProfit) as totalExpectedProfit
       FROM 
         trades
       GROUP BY 
@@ -261,8 +292,10 @@ export const getSymbolStats = () => {
       return {
         symbol: row.symbol,
         totalTrades: row.totalTrades,
+        winCount: row.winCount || 0,
         winRate,
         totalProfit: row.totalProfit || 0,
+        totalExpectedProfit: row.totalExpectedProfit || 0,
         averageProfit,
       };
     });

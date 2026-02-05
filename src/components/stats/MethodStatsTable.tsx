@@ -1,12 +1,19 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-05 21:57:01
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-05 22:43:49
+ * @Description: 
+ */
 import React from 'react';
 import { Card, Table } from 'antd';
 
 interface MethodStat {
   methodId: string;
   methodName: string;
-  count: number;
-  wins: number;
-  profit: number;
+  totalTrades: number;
+  winCount: number;
+  totalProfit: number;
   expectedProfit: number;
   winRate: string;
 }
@@ -24,13 +31,13 @@ const MethodStatsTable: React.FC<MethodStatsTableProps> = ({ methodStats }) => {
     },
     {
       title: '使用次数',
-      dataIndex: 'count',
-      key: 'count',
+      dataIndex: 'totalTrades',
+      key: 'totalTrades',
     },
     {
       title: '盈利次数',
-      dataIndex: 'wins',
-      key: 'wins',
+      dataIndex: 'winCount',
+      key: 'winCount',
     },
     {
       title: '胜率',
@@ -40,11 +47,11 @@ const MethodStatsTable: React.FC<MethodStatsTableProps> = ({ methodStats }) => {
     },
     {
       title: '总盈亏',
-      dataIndex: 'profit',
-      key: 'profit',
-      render: (profit: number) => (
-        <span className={profit > 0 ? 'profit-positive' : profit < 0 ? 'profit-negative' : 'profit-neutral'}>
-          {profit > 0 ? '+' : ''}{profit}
+      dataIndex: 'totalProfit',
+      key: 'totalProfit',
+      render: (totalProfit: number) => (
+        <span className={totalProfit > 0 ? 'profit-positive' : totalProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
+          {totalProfit > 0 ? '+' : ''}{totalProfit}
         </span>
       ),
     },

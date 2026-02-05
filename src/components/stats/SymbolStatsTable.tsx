@@ -3,9 +3,9 @@ import { Card, Table } from 'antd';
 
 interface SymbolStat {
   symbol: string;
-  count: number;
-  wins: number;
-  profit: number;
+  totalTrades: number;
+  winCount: number;
+  totalProfit: number;
   expectedProfit: number;
   winRate: string;
 }
@@ -23,13 +23,13 @@ const SymbolStatsTable: React.FC<SymbolStatsTableProps> = ({ symbolStats }) => {
     },
     {
       title: '交易次数',
-      dataIndex: 'count',
-      key: 'count',
+      dataIndex: 'totalTrades',
+      key: 'totalTrades',
     },
     {
       title: '盈利次数',
-      dataIndex: 'wins',
-      key: 'wins',
+      dataIndex: 'winCount',
+      key: 'winCount',
     },
     {
       title: '胜率',
@@ -39,11 +39,11 @@ const SymbolStatsTable: React.FC<SymbolStatsTableProps> = ({ symbolStats }) => {
     },
     {
       title: '总盈亏',
-      dataIndex: 'profit',
-      key: 'profit',
-      render: (profit: number) => (
-        <span className={profit > 0 ? 'profit-positive' : profit < 0 ? 'profit-negative' : 'profit-neutral'}>
-          {profit > 0 ? '+' : ''}{profit}
+      dataIndex: 'totalProfit',
+      key: 'totalProfit',
+      render: (totalProfit: number) => (
+        <span className={totalProfit > 0 ? 'profit-positive' : totalProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
+          {totalProfit > 0 ? '+' : ''}{totalProfit}
         </span>
       ),
     },

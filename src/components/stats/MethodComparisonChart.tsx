@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 interface MethodStat {
   methodName: string;
-  profit: number;
+  totalProfit: number;
 }
 
 interface MethodComparisonChartProps {
@@ -21,7 +21,7 @@ const MethodComparisonChart: React.FC<MethodComparisonChartProps> = ({ methodSta
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="profit" fill="#8884d8" name="总盈亏" />
+          <Bar dataKey="totalProfit" fill="#8884d8" name="总盈亏" />
         </BarChart>
       </ResponsiveContainer>
     </Card>
