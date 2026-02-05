@@ -15,6 +15,20 @@ export interface Method {
   total_pnl?: number;
 }
 
+// 清理脏数据（没有id的策略方法）
+export const cleanupDirtyMethods = () => {
+  try {
+    const result = db
+      .prepare("DELETE FROM methods WHERE id IS NULL OR id = ''")
+      .run();
+    if (result.changes > 0) {
+      console.log(`✅ 清理了 ${result.changes} 条没有id的脏数据`);
+    }
+  } catch (error) {
+    console.error("清理脏数据失败:", error);
+  }
+};
+
 // 注册策略方法相关的IPC处理函数
 export function registerMethodHandlers() {
   // 这里将在main.ts中通过ipcMain.handle注册
@@ -26,9 +40,13 @@ export const getMethods = () => {
     const rows = db
       .prepare("SELECT * FROM methods ORDER BY usage_count DESC, win_rate DESC")
       .all();
+
+    // 过滤掉没有id的脏数据
+    const validRows = rows.filter((row) => row.id);
+
     return {
       success: true,
-      data: rows,
+      data: validRows,
     };
   } catch (error) {
     console.error("获取策略方法失败:", error);
@@ -66,10 +84,15 @@ export const getMethod = (id: string) => {
 // 创建新策略方法
 export const createMethod = (method: Method) => {
   try {
+    // 生成唯一id
+    const id =
+      method.id ||
+      `method_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     db.prepare(
       "INSERT INTO methods (id, code, name, description, is_default, usage_count, win_rate, total_pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
     ).run(
-      method.id,
+      id,
       method.code,
       method.name,
       method.description || "",
@@ -81,7 +104,7 @@ export const createMethod = (method: Method) => {
 
     return {
       success: true,
-      data: method,
+      data: { ...method, id },
     };
   } catch (error) {
     console.error("创建策略方法失败:", error);
@@ -155,19 +178,28 @@ export const deleteMethod = (id: string) => {
 // 获取默认策略方法
 export const getDefaultMethod = () => {
   try {
-    const row = db.prepare("SELECT * FROM methods WHERE is_default = 1").get();
-    if (row) {
+    // 获取所有有效策略方法（有id的）
+    const validMethods = db
+      .prepare(
+        "SELECT * FROM methods WHERE id IS NOT NULL ORDER BY usage_count DESC, win_rate DESC",
+      )
+      .all();
+
+    // 查找默认策略
+    const defaultMethod = validMethods.find(
+      (method) => method.is_default === 1,
+    );
+    if (defaultMethod) {
       return {
         success: true,
-        data: row,
+        data: defaultMethod,
       };
     } else {
-      // 如果没有默认策略，返回第一个策略
-      const firstMethod = db.prepare("SELECT * FROM methods LIMIT 1").get();
-      if (firstMethod) {
+      // 如果没有默认策略，返回第一个有效策略
+      if (validMethods.length > 0) {
         return {
           success: true,
-          data: firstMethod,
+          data: validMethods[0],
         };
       } else {
         return {

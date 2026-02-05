@@ -103,6 +103,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ form, methods, initialValues }) =
             return optionLabel.toLowerCase().includes(input.toLowerCase());
           }}
           onChange={(value) => {
+            console.log('methods:', methods);
             // 根据选择的methodId查找对应的methodName
             const selectedMethod = methods.find(m => m.id === value);
             if (selectedMethod) {

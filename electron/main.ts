@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 17:43:18
+ * @LastEditTime: 2026-02-05 22:22:07
  * @Description:
  */
 import { app, BrowserWindow, ipcMain } from "electron";
@@ -46,6 +46,9 @@ const registerIpcHandlers = () => {
     tradeHandlers.updateTrade(id, trade),
   );
   ipcMain.handle("trades:delete", (_, id) => tradeHandlers.deleteTrade(id));
+
+  // 清理脏数据
+  methodHandlers.cleanupDirtyMethods();
 
   // 策略方法相关的IPC处理函数
   ipcMain.handle("methods:list", () => methodHandlers.getMethods());
