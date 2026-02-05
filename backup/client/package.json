@@ -1,6 +1,6 @@
 {
   "name": "trading-review-electron",
-  "productName": "trading-review-electron",
+  "productName": "交易复盘系统",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",

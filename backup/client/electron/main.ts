@@ -2,10 +2,11 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-01-21 16:10:34
+ * @LastEditTime: 2026-02-05 16:14:30
  * @Description:
  */
 import { app, BrowserWindow, ipcMain } from "electron";
+import fs from "fs";
 import path from "node:path";
 import { spawn, ChildProcess } from "node:child_process";
 import started from "electron-squirrel-startup";
@@ -37,7 +38,13 @@ const startBackend = () => {
   } else {
     // 生产环境：使用打包后的资源目录下的server目录
     // 当使用extraResource打包时，server目录会被放在Resources目录下
+    // 对于所有平台，app.getAppPath() 返回的都是 app.asar 文件路径
+    // 例如：
+    // macOS: /path/to/app.app/Contents/Resources/app.asar
+    // Windows: C:\path\to\app\resources\app.asar
+    // 我们需要找到其所在目录，即 Resources 目录
     const resourcesPath = path.dirname(appPath);
+
     backendPath = path.join(resourcesPath, "server/index.js");
     backendCwd = path.join(resourcesPath, "server");
   }
@@ -49,14 +56,80 @@ const startBackend = () => {
   console.log(`🔧 环境: ${isDev ? "开发环境" : "生产环境"}`);
 
   // 启动后端服务
-  backendProcess = spawn("node", [backendPath], {
-    cwd: backendCwd,
-    env: {
-      ...process.env,
-      NODE_ENV: isDev ? "development" : "production",
-    },
-    stdio: "inherit",
-  });
+  try {
+    console.log(`🔍 检查后端服务文件是否存在: ${backendPath}`);
+    if (fs.existsSync(backendPath)) {
+      console.log(`✅ 后端服务文件存在`);
+
+      // 检查文件权限
+      const stats = fs.statSync(backendPath);
+      console.log(`📝 文件权限: ${stats.mode.toString(8)}`);
+
+      // 检查工作目录是否存在
+      if (fs.existsSync(backendCwd)) {
+        console.log(`✅ 后端工作目录存在`);
+      } else {
+        console.error(`❌ 后端工作目录不存在: ${backendCwd}`);
+      }
+    } else {
+      console.error(`❌ 后端服务文件不存在: ${backendPath}`);
+
+      // 列出resources目录内容，帮助诊断路径问题
+      const resourcesPath = isDev
+        ? path.join(__dirname, "../../server")
+        : path.dirname(appPath);
+      console.log(`📋 资源目录内容:`);
+      try {
+        const files = fs.readdirSync(resourcesPath, { withFileTypes: true });
+        files.forEach((file) => {
+          console.log(`  ${file.isDirectory() ? "📁" : "📄"} ${file.name}`);
+        });
+      } catch (err) {
+        console.error(`❌ 无法读取资源目录: ${err.message}`);
+      }
+    }
+  } catch (error) {
+    console.error(`❌ 检查后端服务文件时出错: ${error.message}`);
+  }
+
+  try {
+    // 对于macOS，使用与Electron捆绑的Node.js
+    let nodePath = "node";
+    if (process.platform === "darwin") {
+      // macOS: 使用Electron应用内置的Node.js
+      nodePath = path.join(
+        process.execPath,
+        "../../Frameworks/Electron Framework.framework/Versions/A/Resources/electron_node",
+      );
+      console.log(`🍎 macOS: 使用内置Node.js路径: ${nodePath}`);
+
+      // 检查内置Node.js是否存在
+      if (!fs.existsSync(nodePath)) {
+        console.warn(`⚠️  内置Node.js不存在，使用系统Node.js`);
+        nodePath = "node";
+      }
+    }
+
+    console.log(`🚀 尝试启动后端服务，使用Node路径: ${nodePath}`);
+    console.log(`📂 后端服务路径: ${backendPath}`);
+    console.log(`📂 后端工作目录: ${backendCwd}`);
+
+    backendProcess = spawn(nodePath, [backendPath], {
+      cwd: backendCwd,
+      env: {
+        ...process.env,
+        NODE_ENV: isDev ? "development" : "production",
+        // 添加额外的环境变量，帮助诊断
+        ELECTRON_RUN_AS_NODE: "1",
+      },
+      stdio: "inherit",
+    });
+
+    console.log(`✅ 后端服务进程已启动，PID: ${backendProcess.pid}`);
+  } catch (error) {
+    console.error(`❌ 启动后端服务失败: ${error.message}`);
+    console.error(`📋 错误详情:`, error);
+  }
 
   // 监听后端服务退出事件
   backendProcess.on("exit", (code, signal) => {
