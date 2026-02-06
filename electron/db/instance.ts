@@ -5,6 +5,7 @@
  * @LastEditTime: 2026-02-06 16:45:23
  * @Description:
  */
+import { app } from "electron";
 import path from "path";
 import fs from "fs";
 import { createRequire } from "module";
@@ -23,8 +24,9 @@ export const initDatabase = () => {
     // 加载 better-sqlite3 模块
     const Database = require("better-sqlite3");
 
-    // 使用相对路径存储数据库文件
-    const dbPath = path.join(__dirname, "trading.db");
+    // 使用 userData 目录存储数据库文件（可写目录）
+    const userDataPath = app.getPath('userData');
+    const dbPath = path.join(userDataPath, "trading.db");
     const dbDir = path.dirname(dbPath);
 
     // 确保目录存在
@@ -32,6 +34,8 @@ export const initDatabase = () => {
       fs.mkdirSync(dbDir, { recursive: true });
       console.log("✅ 数据库目录创建成功");
     }
+
+    console.log(`📂 数据库路径: ${dbPath}`);
 
     // 连接数据库
     db = new Database(dbPath);
