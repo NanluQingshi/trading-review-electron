@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-02-06 15:25:31
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 20:00:00
+ * @LastEditTime: 2026-02-06 21:29:55
  * @Description:
  */
 import { app } from "electron";
@@ -19,8 +19,6 @@ let db: any = null;
 // 初始化数据库
 export const initDatabase = () => {
   try {
-    console.log("📁 初始化数据库连接...");
-
     // 加载 better-sqlite3 模块
     const Database = require("better-sqlite3");
 
@@ -32,14 +30,10 @@ export const initDatabase = () => {
     // 确保目录存在
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
-      console.log("✅ 数据库目录创建成功");
     }
-
-    console.log(`📂 数据库路径: ${dbPath}`);
 
     // 连接数据库
     db = new Database(dbPath);
-    console.log("✅ 数据库连接成功");
 
     // 创建表结构
     createTables();
@@ -56,8 +50,6 @@ const createTables = () => {
   if (!db) return;
 
   try {
-    console.log("📋 创建表结构...");
-
     // 创建 methods 表
     db.exec(`
       CREATE TABLE IF NOT EXISTS methods (
@@ -71,8 +63,6 @@ const createTables = () => {
         total_pnl REAL DEFAULT 0
       )
     `);
-    console.log("✅ methods 表创建成功");
-
     // 创建 trades 表
     db.exec(`
       CREATE TABLE IF NOT EXISTS trades (
@@ -95,9 +85,6 @@ const createTables = () => {
         FOREIGN KEY (methodId) REFERENCES methods(id) ON DELETE SET NULL
       )
     `);
-    console.log("✅ trades 表创建成功");
-
-    console.log("✅ 表结构创建成功");
   } catch (error) {
     console.error("❌ 表结构创建失败:", error);
   }

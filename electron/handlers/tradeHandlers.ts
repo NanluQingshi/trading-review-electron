@@ -4,9 +4,7 @@ import { initDatabase, getDb } from "@electron/db/instance";
 const ensureDatabaseInitialized = () => {
   const db = getDb();
   if (!db) {
-    console.log("🔧 确保数据库初始化完成...");
     initDatabase();
-    console.log("✅ 数据库初始化完成");
   }
 };
 
@@ -347,10 +345,6 @@ export const updateMethodStats = (methodId: string) => {
     runQuery(
       "UPDATE methods SET usage_count = ?, win_rate = ?, total_pnl = ? WHERE id = ?",
       [usageCount, winRate, totalPnl, methodId],
-    );
-
-    console.log(
-      `📊 更新方法 ${methodId} 的统计数据：使用次数=${usageCount}，胜率=${winRate}，总盈亏=${totalPnl}`,
     );
   } catch (error) {
     console.error("更新方法统计数据失败:", error);

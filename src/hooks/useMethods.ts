@@ -36,7 +36,6 @@ export const useMethods = () => {
   const createMethod = async (methodData: Partial<Method>) => {
     try {
       const response = await methodsApi.createMethod(methodData);
-      console.log('create-method', response);
       if (response && response.success) {
         message.success("创建成功");
         fetchMethods();

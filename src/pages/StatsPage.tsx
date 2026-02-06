@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-17 23:32:05
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 23:10:15
+ * @LastEditTime: 2026-02-06 21:26:32
  * @Description: 
  */
 import React from 'react';
@@ -11,14 +11,16 @@ import { Stats } from '@/components';
 import { useStats } from '@/hooks';
 
 const StatsPage: React.FC = () => {
-  console.log('StatsPage rendered');
   // 使用自定义hooks
   const { stats, loading } = useStats();
 
   if (loading && !stats) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-        <Spin size="large" tip="加载统计数据中..." />
+        <div style={{ textAlign: 'center' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16 }}>加载统计数据中...</div>
+        </div>
       </div>
     );
   }

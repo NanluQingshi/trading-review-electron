@@ -21,10 +21,8 @@ if (started) {
 // 初始化应用
 const initializeApp = () => {
   try {
-    console.log("🚀 初始化应用...");
     // 初始化数据库
     initDatabase();
-    console.log("✅ 数据库初始化成功");
   } catch (error) {
     console.error("❌ 数据库初始化失败:", error);
   }
@@ -32,8 +30,6 @@ const initializeApp = () => {
 
 // 注册IPC处理函数
 const registerIpcHandlers = () => {
-  console.log("🔧 注册IPC处理函数...");
-
   // 交易相关的IPC处理函数
   ipcMain.handle("trades:list", (_, filters) =>
     tradeHandlers.getTrades(filters),
@@ -78,8 +74,6 @@ const registerIpcHandlers = () => {
 
   // 应用相关的IPC处理函数
   ipcMain.handle("app:version", () => app.getVersion());
-
-  console.log("✅ IPC处理函数注册成功");
 };
 
 const createWindow = () => {

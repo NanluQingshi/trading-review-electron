@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 19:19:00
+ * @LastEditTime: 2026-02-06 21:29:23
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -39,14 +39,11 @@ const config: ForgeConfig = {
         fs.mkdirSync(destBase, { recursive: true });
       }
 
-      console.log('🚧 正在手动修复 Native Dependencies...');
-
       for (const moduleName of modulesToCopy) {
         const sourcePath = path.join(sourceBase, moduleName);
         const destPath = path.join(destBase, moduleName);
 
         if (fs.existsSync(sourcePath)) {
-          console.log(`   -> Copying ${moduleName}...`);
           // 递归复制
           fs.cpSync(sourcePath, destPath, { recursive: true, force: true });
         } else {
@@ -54,7 +51,6 @@ const config: ForgeConfig = {
         }
       }
       
-      console.log('✅ 手动修复完成！');
     },
   },
   makers: [

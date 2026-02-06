@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-02-05 21:57:01
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 21:18:23
+ * @LastEditTime: 2026-02-06 21:31:11
  * @Description: 
  */
 import React from 'react';
@@ -59,7 +59,6 @@ const TradeModal: React.FC<TradeModalProps> = ({
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      console.log('values', values);
       await onOk(values);
       form.resetFields();
     } catch (error) {

@@ -4,9 +4,7 @@ import { initDatabase, getDb } from "@electron/db/instance";
 const ensureDatabaseInitialized = () => {
   const db = getDb();
   if (!db) {
-    console.log("🔧 确保数据库初始化完成...");
     initDatabase();
-    console.log("✅ 数据库初始化完成");
   }
 };
 

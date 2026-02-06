@@ -4,9 +4,7 @@ import { initDatabase, getDb } from "@electron/db/instance";
 const ensureDatabaseInitialized = () => {
   const db = getDb();
   if (!db) {
-    console.log("🔧 确保数据库初始化完成...");
     initDatabase();
-    console.log("✅ 数据库初始化完成");
   }
 };
 
@@ -177,8 +175,7 @@ export const setDefaultMethod = (id: string) => {
 // 清理脏数据
 export const cleanupDirtyMethods = () => {
   try {
-    // 这里可以添加清理脏数据的逻辑
-    console.log("🧹 清理脏数据...");
+    // TODO: 这里可以添加清理脏数据的逻辑
     return { success: true };
   } catch (error) {
     console.error("清理脏数据失败:", error);

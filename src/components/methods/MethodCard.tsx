@@ -1,3 +1,10 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-05 21:57:01
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 21:22:42
+ * @Description: 方法卡片组件
+ */
 import React from 'react';
 import { 
   Card, 
@@ -41,7 +48,7 @@ const MethodCard: React.FC<MethodCardProps> = ({ method, onEdit, onDelete }) => 
       styles={{ body: { flex: 1 } }}
     >
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Tag color="blue" style={{ marginBottom: 8 }}>{method.code}</Tag>
           <Title level={4} style={{ margin: 0 }}>{method.name}</Title>
         </Space>
