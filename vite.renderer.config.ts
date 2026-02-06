@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 19:19:00
+ * @LastEditTime: 2026-02-06 22:41:36
  * @Description:
  */
 import { defineConfig } from "vite";
@@ -27,7 +27,6 @@ export default defineConfig({
         // 忽略其他可能的警告
         warn(warning);
       },
-      external: ["react-is"],
     },
   },
 });
