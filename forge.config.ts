@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 17:17:06
+ * @LastEditTime: 2026-02-06 12:01:10
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -14,16 +14,15 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import path from "path";
+import fs from "fs";
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    extraResource: [path.join(__dirname, "../server")],
   },
-  rebuildConfig: {},
   makers: [
     new MakerSquirrel({}),
-    new MakerZIP({}, ["darwin"]),
+    new MakerZIP({}, ["darwin", "win32"]),
     new MakerRpm({}),
     new MakerDeb({}),
   ],

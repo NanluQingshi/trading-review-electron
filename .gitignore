@@ -11,6 +11,7 @@ dist/
 **/dist/
 .next/
 out/
+.vite/
 
 # Environment variables
 # .env

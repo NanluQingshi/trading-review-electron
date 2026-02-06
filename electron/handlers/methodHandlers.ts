@@ -3,6 +3,55 @@ import { initDatabase } from "../db/instance";
 // 获取数据库实例
 const db = initDatabase();
 
+// 包装 sqlite3 回调为 Promise
+const runQuery = (sql: string, params: any[] = []) => {
+  return new Promise<{ changes: number }>((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+    db.run(sql, params, function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+};
+
+const getQuery = (sql: string, params: any[] = []) => {
+  return new Promise<any>((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+};
+
+const allQuery = (sql: string, params: any[] = []) => {
+  return new Promise<any[]>((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
 // 策略方法类型定义
 export interface Method {
   id: string;
@@ -16,11 +65,9 @@ export interface Method {
 }
 
 // 清理脏数据（没有id的策略方法）
-export const cleanupDirtyMethods = () => {
+export const cleanupDirtyMethods = async () => {
   try {
-    const result = db
-      .prepare("DELETE FROM methods WHERE id IS NULL OR id = ''")
-      .run();
+    const result = await runQuery("DELETE FROM methods WHERE id IS NULL OR id = ''");
     if (result.changes > 0) {
       console.log(`✅ 清理了 ${result.changes} 条没有id的脏数据`);
     }
@@ -35,11 +82,9 @@ export function registerMethodHandlers() {
 }
 
 // 获取所有策略方法
-export const getMethods = () => {
+export const getMethods = async () => {
   try {
-    const rows = db
-      .prepare("SELECT * FROM methods ORDER BY usage_count DESC, win_rate DESC")
-      .all();
+    const rows = await allQuery("SELECT * FROM methods ORDER BY usage_count DESC, win_rate DESC");
 
     // 过滤掉没有id的脏数据
     const validRows = rows.filter((row) => row.id);
@@ -58,9 +103,10 @@ export const getMethods = () => {
 };
 
 // 获取单个策略方法
-export const getMethod = (id: string) => {
+export const getMethod = async (id: string) => {
   try {
-    const row = db.prepare("SELECT * FROM methods WHERE id = ?").get(id);
+    const row = await getQuery("SELECT * FROM methods WHERE id = ?", [id]);
+
     if (row) {
       return {
         success: true,
@@ -82,24 +128,25 @@ export const getMethod = (id: string) => {
 };
 
 // 创建新策略方法
-export const createMethod = (method: Method) => {
+export const createMethod = async (method: Method) => {
   try {
     // 生成唯一id
     const id =
       method.id ||
       `method_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    db.prepare(
+    await runQuery(
       "INSERT INTO methods (id, code, name, description, is_default, usage_count, win_rate, total_pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    ).run(
-      id,
-      method.code,
-      method.name,
-      method.description || "",
-      method.is_default || 0,
-      method.usage_count || 0,
-      method.win_rate || 0,
-      method.total_pnl || 0,
+      [
+        id,
+        method.code,
+        method.name,
+        method.description || "",
+        method.is_default || 0,
+        method.usage_count || 0,
+        method.win_rate || 0,
+        method.total_pnl || 0,
+      ]
     );
 
     return {
@@ -116,19 +163,18 @@ export const createMethod = (method: Method) => {
 };
 
 // 更新策略方法
-export const updateMethod = (id: string, method: Partial<Method>) => {
+export const updateMethod = async (id: string, method: Partial<Method>) => {
   try {
-    const result = db
-      .prepare(
-        "UPDATE methods SET code = ?, name = ?, description = ?, is_default = ? WHERE id = ?",
-      )
-      .run(
+    const result = await runQuery(
+      "UPDATE methods SET code = ?, name = ?, description = ?, is_default = ? WHERE id = ?",
+      [
         method.code || "",
         method.name || "",
         method.description || "",
         method.is_default || 0,
         id,
-      );
+      ]
+    );
 
     if (result.changes > 0) {
       return {
@@ -151,9 +197,9 @@ export const updateMethod = (id: string, method: Partial<Method>) => {
 };
 
 // 删除策略方法
-export const deleteMethod = (id: string) => {
+export const deleteMethod = async (id: string) => {
   try {
-    const result = db.prepare("DELETE FROM methods WHERE id = ?").run(id);
+    const result = await runQuery("DELETE FROM methods WHERE id = ?", [id]);
 
     if (result.changes > 0) {
       return {
@@ -176,14 +222,12 @@ export const deleteMethod = (id: string) => {
 };
 
 // 获取默认策略方法
-export const getDefaultMethod = () => {
+export const getDefaultMethod = async () => {
   try {
     // 获取所有有效策略方法（有id的）
-    const validMethods = db
-      .prepare(
-        "SELECT * FROM methods WHERE id IS NOT NULL ORDER BY usage_count DESC, win_rate DESC",
-      )
-      .all();
+    const validMethods = await allQuery(
+      "SELECT * FROM methods WHERE id IS NOT NULL ORDER BY usage_count DESC, win_rate DESC"
+    );
 
     // 查找默认策略
     const defaultMethod = validMethods.find(

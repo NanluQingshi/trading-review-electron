@@ -1,10 +1,10 @@
-import Database from "better-sqlite3";
+import sqlite3 from "sqlite3";
 import { app } from "electron";
 import path from "path";
 import fs from "fs";
 
 // 延迟初始化数据库，确保 app 已完全初始化
-let db: Database | null = null;
+let db: sqlite3.Database | null = null;
 
 const initDatabase = () => {
   try {
@@ -31,14 +31,16 @@ const initDatabase = () => {
     console.log("✅ 目录可写性检查成功");
 
     // 连接数据库
-    db = new Database(dbPath);
-    console.log("✅ 数据库连接成功");
+    db = new sqlite3.Database(dbPath, (err) => {
+      if (err) {
+        console.error("❌ 数据库连接失败:", err);
+        return;
+      }
+      console.log("✅ 数据库连接成功");
 
-    // 开启 WAL 模式，提升性能
-    db.pragma("journal_mode = WAL");
-
-    // 创建表结构
-    createTables();
+      // 创建表结构
+      createTables();
+    });
 
     return db;
   } catch (error) {
@@ -56,14 +58,16 @@ const initDatabase = () => {
       }
 
       // 连接数据库
-      db = new Database(fallbackDbPath);
-      console.log("✅ 备选数据库连接成功");
+      db = new sqlite3.Database(fallbackDbPath, (err) => {
+        if (err) {
+          console.error("❌ 备选数据库连接失败:", err);
+          return;
+        }
+        console.log("✅ 备选数据库连接成功");
 
-      // 开启 WAL 模式，提升性能
-      db.pragma("journal_mode = WAL");
-
-      // 创建表结构
-      createTables();
+        // 创建表结构
+        createTables();
+      });
 
       return db;
     } catch (fallbackError) {
@@ -81,7 +85,7 @@ const createTables = () => {
     console.log("📋 创建表结构...");
 
     // 创建 methods 表
-    db.exec(`
+    db.run(`
       CREATE TABLE IF NOT EXISTS methods (
         id TEXT PRIMARY KEY,
         code TEXT NOT NULL,
@@ -92,10 +96,16 @@ const createTables = () => {
         win_rate REAL DEFAULT 0,
         total_pnl REAL DEFAULT 0
       )
-    `);
+    `, (err) => {
+      if (err) {
+        console.error("❌ 创建 methods 表失败:", err);
+        return;
+      }
+      console.log("✅ methods 表创建成功");
+    });
 
     // 创建 trades 表
-    db.exec(`
+    db.run(`
       CREATE TABLE IF NOT EXISTS trades (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         symbol TEXT NOT NULL,
@@ -114,7 +124,13 @@ const createTables = () => {
         result TEXT CHECK (result IN ('win', 'loss', 'breakeven')),
         FOREIGN KEY (methodId) REFERENCES methods(id) ON DELETE SET NULL
       )
-    `);
+    `, (err) => {
+      if (err) {
+        console.error("❌ 创建 trades 表失败:", err);
+        return;
+      }
+      console.log("✅ trades 表创建成功");
+    });
 
     console.log("✅ 表结构创建成功");
   } catch (error) {
