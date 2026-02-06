@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 12:01:10
+ * @LastEditTime: 2026-02-06 15:54:03
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -18,7 +18,10 @@ import fs from "fs";
 
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      // 这里的路径需要包含 sqlite3 的二进制文件所在目录
+      unpack: "**/node_modules/sqlite3/**/*",
+    },
   },
   makers: [
     new MakerSquirrel({}),

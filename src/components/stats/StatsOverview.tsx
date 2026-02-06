@@ -1,3 +1,10 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-05 21:57:01
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 16:07:15
+ * @Description: 
+ */
 import React from 'react';
 import { Card, Row, Col, Statistic } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, TrophyOutlined, DollarOutlined } from '@ant-design/icons';
@@ -20,7 +27,7 @@ const StatsOverview: React.FC<StatsOverviewProps> = ({ overview }) => {
         <Card>
           <Statistic
             title="总交易次数"
-            value={overview.totalTrades}
+            value={overview?.totalTrades}
             prefix={<TrophyOutlined />}
           />
         </Card>

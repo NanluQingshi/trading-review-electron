@@ -19,9 +19,14 @@ export const useMethods = () => {
     setLoading(true);
     try {
       const response = await methodsApi.getMethods();
-      setMethods(response.data);
+      if (response && response.success) {
+        setMethods(response.data || []);
+      } else {
+        setMethods([]);
+      }
     } catch (error) {
       message.error("获取方法库失败");
+      setMethods([]);
     } finally {
       setLoading(false);
     }

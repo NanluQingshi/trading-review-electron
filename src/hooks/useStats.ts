@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-18 01:45:53
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 23:03:22
+ * @LastEditTime: 2026-02-06 16:07:35
  * @Description:
  */
 import { useState, useEffect } from "react";
@@ -37,18 +37,18 @@ export const useStats = () => {
       // 转换数据格式以匹配前端期望的类型
       const formattedStats: Stats = {
         overview: {
-          totalTrades: overallData.totalTrades || 0,
-          winTrades: overallData.totalWin || 0,
-          lossTrades: overallData.totalLoss || 0,
-          breakevenTrades: overallData.totalBreakeven || 0,
-          winRate: (overallData.winRate || 0) * 100, // 将小数转换为百分比
-          totalProfit: overallData.totalProfit || 0,
-          avgProfit: overallData.averageProfit || 0,
-          avgWin: overallData.avgWin || 0, // 使用后端返回的avgWin字段
-          avgLoss: overallData.avgLoss || 0, // 使用后端返回的avgLoss字段
-          profitFactor: overallData.profitFactor || 0,
-          totalExpectedProfit: overallData.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
-          avgExpectedProfit: overallData.avgExpectedProfit || 0, // 使用后端返回的avgExpectedProfit字段
+          totalTrades: overallData?.totalTrades || 0,
+          winTrades: overallData?.totalWin || 0,
+          lossTrades: overallData?.totalLoss || 0,
+          breakevenTrades: overallData?.totalBreakeven || 0,
+          winRate: (overallData?.winRate || 0) * 100, // 将小数转换为百分比
+          totalProfit: overallData?.totalProfit || 0,
+          avgProfit: overallData?.averageProfit || 0,
+          avgWin: overallData?.avgWin || 0, // 使用后端返回的avgWin字段
+          avgLoss: overallData?.avgLoss || 0, // 使用后端返回的avgLoss字段
+          profitFactor: overallData?.profitFactor || 0,
+          totalExpectedProfit: overallData?.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
+          avgExpectedProfit: overallData?.avgExpectedProfit || 0, // 使用后端返回的avgExpectedProfit字段
         },
         symbolStats: (symbolStatsData || []).map((stat) => ({
           ...stat,
