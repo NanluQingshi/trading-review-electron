@@ -1,56 +1,48 @@
-import { initDatabase } from "../db/instance";
-import sqlite3 from "sqlite3";
+import { initDatabase, getDb } from "../db/instance";
 
-// 获取数据库实例
-const db = initDatabase();
+// 确保数据库初始化完成
+const ensureDatabaseInitialized = () => {
+  const db = getDb();
+  if (!db) {
+    console.log("🔧 确保数据库初始化完成...");
+    initDatabase();
+    console.log("✅ 数据库初始化完成");
+  }
+};
 
-// Promise 包装器
+// 初始化数据库
+initDatabase();
+
+// 使用 better-sqlite3 的同步 API
 const runQuery = (sql: string, params: any[] = []) => {
-  return new Promise<{ changes: number }>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.run(sql, params, function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  const result = stmt.run(params);
+  return { changes: result.changes };
 };
 
 const getQuery = (sql: string, params: any[] = []) => {
-  return new Promise<any>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row);
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  return stmt.get(params);
 };
 
 const allQuery = (sql: string, params: any[] = []) => {
-  return new Promise<any[]>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  return stmt.all(params);
 };
 
 // 统计数据类型定义
@@ -94,10 +86,10 @@ export function registerStatsHandlers() {
 }
 
 // 获取总体统计数据
-export const getOverallStats = async () => {
+export const getOverallStats = () => {
   try {
     // 获取交易总数
-    const totalTradesResult = await getQuery("SELECT COUNT(*) as count FROM trades");
+    const totalTradesResult = getQuery("SELECT COUNT(*) as count FROM trades");
     const totalTrades = totalTradesResult?.count || 0;
 
     if (totalTrades === 0) {
@@ -124,10 +116,14 @@ export const getOverallStats = async () => {
     }
 
     // 获取盈利、亏损、保本的交易数量
-    const winResult = await getQuery("SELECT COUNT(*) as count FROM trades WHERE result = 'win'");
-    const lossResult = await getQuery("SELECT COUNT(*) as count FROM trades WHERE result = 'loss'");
-    const breakevenResult = await getQuery(
-      "SELECT COUNT(*) as count FROM trades WHERE result = 'breakeven'"
+    const winResult = getQuery(
+      "SELECT COUNT(*) as count FROM trades WHERE result = 'win'",
+    );
+    const lossResult = getQuery(
+      "SELECT COUNT(*) as count FROM trades WHERE result = 'loss'",
+    );
+    const breakevenResult = getQuery(
+      "SELECT COUNT(*) as count FROM trades WHERE result = 'breakeven'",
     );
 
     const totalWin = winResult?.count || 0;
@@ -138,23 +134,29 @@ export const getOverallStats = async () => {
     const winRate = Math.round((totalWin / totalTrades) * 100) / 100;
 
     // 获取总盈亏
-    const profitResult = await getQuery("SELECT SUM(profit) as total FROM trades");
+    const profitResult = getQuery("SELECT SUM(profit) as total FROM trades");
     const totalProfit = profitResult?.total || 0;
 
     // 计算平均盈亏
     const averageProfit = Math.round((totalProfit / totalTrades) * 100) / 100;
 
     // 获取最大盈利和最大亏损
-    const maxProfitResult = await getQuery("SELECT MAX(profit) as max FROM trades WHERE profit > 0");
-    const maxLossResult = await getQuery("SELECT MIN(profit) as min FROM trades WHERE profit < 0");
+    const maxProfitResult = getQuery(
+      "SELECT MAX(profit) as max FROM trades WHERE profit > 0",
+    );
+    const maxLossResult = getQuery(
+      "SELECT MIN(profit) as min FROM trades WHERE profit < 0",
+    );
 
     const maxProfit = maxProfitResult?.max || 0;
     const maxLoss = maxLossResult?.min || 0;
 
     // 计算盈利因子
-    const totalWinAmountResult = await getQuery("SELECT SUM(profit) as total FROM trades WHERE result = 'win'");
-    const totalLossAmountResult = await getQuery(
-      "SELECT SUM(ABS(profit)) as total FROM trades WHERE result = 'loss'"
+    const totalWinAmountResult = getQuery(
+      "SELECT SUM(profit) as total FROM trades WHERE result = 'win'",
+    );
+    const totalLossAmountResult = getQuery(
+      "SELECT SUM(ABS(profit)) as total FROM trades WHERE result = 'loss'",
     );
 
     const totalWinAmount = totalWinAmountResult?.total || 0;
@@ -164,8 +166,8 @@ export const getOverallStats = async () => {
       Math.round((totalWinAmount / totalLossAmount) * 100) / 100;
 
     // 计算平均持有时间（简化计算，以小时为单位）
-    const holdingTimeResult = await getQuery(
-      "SELECT AVG((JULIANDAY(exitTime) - JULIANDAY(entryTime)) * 24) as avg FROM trades WHERE entryTime AND exitTime"
+    const holdingTimeResult = getQuery(
+      "SELECT AVG((JULIANDAY(exitTime) - JULIANDAY(entryTime)) * 24) as avg FROM trades WHERE entryTime AND exitTime",
     );
 
     const averageHoldingTime = Math.round(
@@ -173,8 +175,8 @@ export const getOverallStats = async () => {
     );
 
     // 计算总预期盈亏和平均预期盈亏
-    const expectedProfitResult = await getQuery(
-      "SELECT SUM(expectedProfit) as total, AVG(expectedProfit) as avg FROM trades WHERE expectedProfit IS NOT NULL"
+    const expectedProfitResult = getQuery(
+      "SELECT SUM(expectedProfit) as total, AVG(expectedProfit) as avg FROM trades WHERE expectedProfit IS NOT NULL",
     );
     const totalExpectedProfit =
       Math.round((expectedProfitResult?.total || 0) * 100) / 100;
@@ -182,9 +184,11 @@ export const getOverallStats = async () => {
       Math.round((expectedProfitResult?.avg || 0) * 100) / 100;
 
     // 计算平均盈利和平均亏损
-    const avgWinResult = await getQuery("SELECT AVG(profit) as avg FROM trades WHERE result = 'win'");
-    const avgLossResult = await getQuery(
-      "SELECT AVG(ABS(profit)) as avg FROM trades WHERE result = 'loss'"
+    const avgWinResult = getQuery(
+      "SELECT AVG(profit) as avg FROM trades WHERE result = 'win'",
+    );
+    const avgLossResult = getQuery(
+      "SELECT AVG(ABS(profit)) as avg FROM trades WHERE result = 'loss'",
     );
     const avgWin = Math.round((avgWinResult?.avg || 0) * 100) / 100;
     const avgLoss = Math.round((avgLossResult?.avg || 0) * 100) / 100;
@@ -219,9 +223,9 @@ export const getOverallStats = async () => {
 };
 
 // 获取方法统计数据
-export const getMethodStats = async () => {
+export const getMethodStats = () => {
   try {
-    const rows = await allQuery(
+    const rows = allQuery(
       `
       SELECT 
         m.id as methodId, 
@@ -240,7 +244,7 @@ export const getMethodStats = async () => {
         m.id, m.name
       ORDER BY 
         totalTrades DESC
-    `
+    `,
     );
 
     const stats = rows.map((row: any) => {
@@ -284,9 +288,9 @@ export const getMethodStats = async () => {
 };
 
 // 获取符号统计数据
-export const getSymbolStats = async () => {
+export const getSymbolStats = () => {
   try {
-    const rows = await allQuery(
+    const rows = allQuery(
       `
       SELECT 
         symbol,
@@ -300,7 +304,7 @@ export const getSymbolStats = async () => {
         symbol
       ORDER BY 
         totalTrades DESC
-    `
+    `,
     );
 
     const stats = rows.map((row: any) => {
@@ -338,7 +342,7 @@ export const getSymbolStats = async () => {
 };
 
 // 获取按时间周期的统计数据（日、周、月）
-export const getTimePeriodStats = async (period: "day" | "week" | "month") => {
+export const getTimePeriodStats = (period: "day" | "week" | "month") => {
   try {
     let dateFormat = "%Y-%m-%d"; // 默认按天
     if (period === "week") {
@@ -347,7 +351,7 @@ export const getTimePeriodStats = async (period: "day" | "week" | "month") => {
       dateFormat = "%Y-%m"; // 按月
     }
 
-    const rows = await allQuery(
+    const rows = allQuery(
       `
       SELECT 
         strftime('${dateFormat}', entryTime) as period,
@@ -360,7 +364,7 @@ export const getTimePeriodStats = async (period: "day" | "week" | "month") => {
         period
       ORDER BY 
         period
-    `
+    `,
     );
 
     const stats = rows.map((row: any) => {
@@ -391,9 +395,11 @@ export const getTimePeriodStats = async (period: "day" | "week" | "month") => {
 };
 
 // 获取盈利曲线数据
-export const getProfitCurve = async () => {
+export const getProfitCurve = () => {
   try {
-    const rows = await allQuery("SELECT exitTime, profit FROM trades ORDER BY exitTime");
+    const rows = allQuery(
+      "SELECT exitTime, profit FROM trades ORDER BY exitTime",
+    );
 
     let cumulativeProfit = 0;
     const curve = rows.map((row: any) => {

@@ -36,9 +36,15 @@ export const useMethods = () => {
   const createMethod = async (methodData: Partial<Method>) => {
     try {
       const response = await methodsApi.createMethod(methodData);
-      message.success("创建成功");
-      fetchMethods();
-      return response.data;
+      console.log('create-method', response);
+      if (response && response.success) {
+        message.success("创建成功");
+        fetchMethods();
+        return response.data;
+      } else {
+        message.error("创建失败");
+        throw new Error("创建失败");
+      }
     } catch (error) {
       message.error("创建失败");
       throw error;
@@ -49,9 +55,14 @@ export const useMethods = () => {
   const updateMethod = async (id: string, methodData: Partial<Method>) => {
     try {
       const response = await methodsApi.updateMethod(id, methodData);
-      message.success("更新成功");
-      fetchMethods();
-      return response.data;
+      if (response && response.success) {
+        message.success("更新成功");
+        fetchMethods();
+        return response.data;
+      } else {
+        message.error("更新失败");
+        throw new Error("更新失败");
+      }
     } catch (error) {
       message.error("更新失败");
       throw error;
@@ -61,9 +72,14 @@ export const useMethods = () => {
   // 删除交易方法
   const deleteMethod = async (id: string) => {
     try {
-      await methodsApi.deleteMethod(id);
-      message.success("删除成功");
-      fetchMethods();
+      const response = await methodsApi.deleteMethod(id);
+      if (response && response.success) {
+        message.success("删除成功");
+        fetchMethods();
+      } else {
+        message.error("删除失败");
+        throw new Error("删除失败");
+      }
     } catch (error) {
       message.error("删除失败");
       throw error;

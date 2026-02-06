@@ -1,56 +1,48 @@
-import { initDatabase } from "../db/instance";
-import sqlite3 from "sqlite3";
+import { initDatabase, getDb } from "../db/instance";
 
-// 获取数据库实例
-const db = initDatabase();
+// 确保数据库初始化完成
+const ensureDatabaseInitialized = () => {
+  const db = getDb();
+  if (!db) {
+    console.log("🔧 确保数据库初始化完成...");
+    initDatabase();
+    console.log("✅ 数据库初始化完成");
+  }
+};
 
-// Promise 包装器
+// 初始化数据库
+initDatabase();
+
+// 使用 better-sqlite3 的同步 API
 const runQuery = (sql: string, params: any[] = []) => {
-  return new Promise<{ changes: number; lastInsertRowid?: number }>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.run(sql, params, function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes, lastInsertRowid: this.lastID });
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  const result = stmt.run(params);
+  return { changes: result.changes, lastInsertRowid: result.lastInsertRowid };
 };
 
 const getQuery = (sql: string, params: any[] = []) => {
-  return new Promise<any>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row);
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  return stmt.get(params);
 };
 
 const allQuery = (sql: string, params: any[] = []) => {
-  return new Promise<any[]>((resolve, reject) => {
-    if (!db) {
-      reject(new Error("Database not initialized"));
-      return;
-    }
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+  ensureDatabaseInitialized();
+  const db = getDb();
+  if (!db) {
+    throw new Error("Database not initialized");
+  }
+  const stmt = db.prepare(sql);
+  return stmt.all(params);
 };
 
 // 交易记录类型定义
@@ -78,7 +70,7 @@ export function registerTradeHandlers() {
 }
 
 // 获取所有交易记录
-export const getTrades = async (filters?: {
+export const getTrades = (filters?: {
   symbol?: string;
   methodId?: string;
   result?: string;
@@ -112,7 +104,7 @@ export const getTrades = async (filters?: {
 
     query += " ORDER BY exitTime DESC";
 
-    const rows = await allQuery(query, params);
+    const rows = allQuery(query, params);
 
     // 处理 tags 字段
     const formattedRows = rows.map((row: any) => ({
@@ -134,9 +126,9 @@ export const getTrades = async (filters?: {
 };
 
 // 获取单个交易记录
-export const getTrade = async (id: number) => {
+export const getTrade = (id: number) => {
   try {
-    const row = await getQuery("SELECT * FROM trades WHERE id = ?", [id]);
+    const row = getQuery("SELECT * FROM trades WHERE id = ?", [id]);
 
     if (row) {
       const trade = {
@@ -163,7 +155,7 @@ export const getTrade = async (id: number) => {
 };
 
 // 创建新交易记录
-export const createTrade = async (trade: Trade) => {
+export const createTrade = (trade: Trade) => {
   try {
     // 使用用户手动输入的盈亏值
     const profit = trade.profit;
@@ -171,13 +163,15 @@ export const createTrade = async (trade: Trade) => {
     // 如果没有提供methodName，尝试从methods表中查询
     let methodName = trade.methodName;
     if (!methodName && trade.methodId) {
-      const method = await getQuery("SELECT name FROM methods WHERE id = ?", [trade.methodId]);
+      const method = getQuery("SELECT name FROM methods WHERE id = ?", [
+        trade.methodId,
+      ]);
       if (method) {
         methodName = method.name;
       }
     }
 
-    const result = await runQuery(
+    const result = runQuery(
       "INSERT INTO trades (symbol, direction, entryPrice, exitPrice, entryTime, exitTime, lots, profit, expectedProfit, methodId, methodName, notes, tags, result) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         trade.symbol,
@@ -194,12 +188,12 @@ export const createTrade = async (trade: Trade) => {
         trade.notes || "",
         JSON.stringify(trade.tags || []),
         trade.result || null,
-      ]
+      ],
     );
 
     // 更新方法统计数据
     if (trade.methodId) {
-      await updateMethodStats(trade.methodId);
+      updateMethodStats(trade.methodId);
     }
 
     return {
@@ -216,25 +210,27 @@ export const createTrade = async (trade: Trade) => {
 };
 
 // 更新交易记录
-export const updateTrade = async (id: number, trade: Trade) => {
+export const updateTrade = (id: number, trade: Trade) => {
   try {
     // 使用用户手动输入的盈亏值
     const profit = trade.profit;
 
     // 获取旧的交易记录，以便比较methodId是否改变
-    const oldTrade = await getQuery("SELECT methodId FROM trades WHERE id = ?", [id]);
+    const oldTrade = getQuery("SELECT methodId FROM trades WHERE id = ?", [id]);
     const oldMethodId = oldTrade?.methodId;
 
     // 如果没有提供methodName，尝试从methods表中查询
     let methodName = trade.methodName;
     if (!methodName && trade.methodId) {
-      const method = await getQuery("SELECT name FROM methods WHERE id = ?", [trade.methodId]);
+      const method = getQuery("SELECT name FROM methods WHERE id = ?", [
+        trade.methodId,
+      ]);
       if (method) {
         methodName = method.name;
       }
     }
 
-    const result = await runQuery(
+    const result = runQuery(
       "UPDATE trades SET symbol = ?, direction = ?, entryPrice = ?, exitPrice = ?, entryTime = ?, exitTime = ?, lots = ?, profit = ?, expectedProfit = ?, methodId = ?, methodName = ?, notes = ?, tags = ?, result = ? WHERE id = ?",
       [
         trade.symbol,
@@ -252,18 +248,18 @@ export const updateTrade = async (id: number, trade: Trade) => {
         JSON.stringify(trade.tags || []),
         trade.result || null,
         id,
-      ]
+      ],
     );
 
     if (result.changes > 0) {
       // 如果methodId改变了，需要更新两个方法的统计数据
       if (oldMethodId !== trade.methodId) {
         if (oldMethodId) {
-          await updateMethodStats(oldMethodId);
+          updateMethodStats(oldMethodId);
         }
       }
       if (trade.methodId) {
-        await updateMethodStats(trade.methodId);
+        updateMethodStats(trade.methodId);
       }
 
       return {
@@ -286,18 +282,18 @@ export const updateTrade = async (id: number, trade: Trade) => {
 };
 
 // 删除交易记录
-export const deleteTrade = async (id: number) => {
+export const deleteTrade = (id: number) => {
   try {
     // 获取要删除的交易记录的methodId
-    const trade = await getQuery("SELECT methodId FROM trades WHERE id = ?", [id]);
+    const trade = getQuery("SELECT methodId FROM trades WHERE id = ?", [id]);
     const methodId = trade?.methodId;
 
-    const result = await runQuery("DELETE FROM trades WHERE id = ?", [id]);
+    const result = runQuery("DELETE FROM trades WHERE id = ?", [id]);
 
     if (result.changes > 0) {
       // 更新方法统计数据
       if (methodId) {
-        await updateMethodStats(methodId);
+        updateMethodStats(methodId);
       }
 
       return {
@@ -320,31 +316,37 @@ export const deleteTrade = async (id: number) => {
 };
 
 // 辅助函数：更新方法统计数据（使用次数和胜率）
-export const updateMethodStats = async (methodId: string) => {
+export const updateMethodStats = (methodId: string) => {
   if (!methodId) return;
 
   try {
     // 统计该方法的使用次数
-    const usageResult = await getQuery("SELECT COUNT(*) as count FROM trades WHERE methodId = ?", [methodId]);
+    const usageResult = getQuery(
+      "SELECT COUNT(*) as count FROM trades WHERE methodId = ?",
+      [methodId],
+    );
     const usageCount = usageResult?.count || 0;
 
     // 统计该方法的胜率
-    const winResult = await getQuery(
+    const winResult = getQuery(
       "SELECT COUNT(*) as count FROM trades WHERE methodId = ? AND result = 'win'",
-      [methodId]
+      [methodId],
     );
     const winCount = winResult?.count || 0;
     const winRate =
       usageCount > 0 ? Math.round((winCount / usageCount) * 100) / 100 : 0;
 
     // 统计总盈亏
-    const pnlResult = await getQuery("SELECT SUM(profit) as total FROM trades WHERE methodId = ?", [methodId]);
+    const pnlResult = getQuery(
+      "SELECT SUM(profit) as total FROM trades WHERE methodId = ?",
+      [methodId],
+    );
     const totalPnl = pnlResult?.total || 0;
 
     // 更新方法的统计数据
-    await runQuery(
+    runQuery(
       "UPDATE methods SET usage_count = ?, win_rate = ?, total_pnl = ? WHERE id = ?",
-      [usageCount, winRate, totalPnl, methodId]
+      [usageCount, winRate, totalPnl, methodId],
     );
 
     console.log(

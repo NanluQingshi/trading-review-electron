@@ -1,12 +1,22 @@
-import { app } from "electron";
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-06 15:25:31
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 16:45:23
+ * @Description:
+ */
 import path from "path";
 import fs from "fs";
+import { createRequire } from "module";
+
+// 创建 require 函数
+const require = createRequire(import.meta.url);
 
 // 数据库实例
 let db: any = null;
 
 // 初始化数据库
-const initDatabase = () => {
+export const initDatabase = () => {
   try {
     console.log("📁 初始化数据库连接...");
 
@@ -88,6 +98,10 @@ const createTables = () => {
   }
 };
 
-// 导出数据库实例和初始化函数
-export { initDatabase };
-export default db;
+// 获取数据库实例
+export const getDb = () => {
+  return db;
+};
+
+// 导出默认值
+export default getDb;

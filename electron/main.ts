@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 22:22:07
+ * @LastEditTime: 2026-02-06 16:50:20
  * @Description:
  */
 import { app, BrowserWindow, ipcMain } from "electron";
@@ -48,10 +48,12 @@ const registerIpcHandlers = () => {
   ipcMain.handle("trades:delete", (_, id) => tradeHandlers.deleteTrade(id));
 
   // 清理脏数据
-  methodHandlers.cleanupDirtyMethods();
+  if (methodHandlers.cleanupDirtyMethods) {
+    methodHandlers.cleanupDirtyMethods();
+  }
 
   // 策略方法相关的IPC处理函数
-  ipcMain.handle("methods:list", () => methodHandlers.getMethods());
+  ipcMain.handle("methods:list", () => methodHandlers.getAllMethods());
   ipcMain.handle("methods:detail", (_, id) => methodHandlers.getMethod(id));
   ipcMain.handle("methods:create", (_, method) =>
     methodHandlers.createMethod(method),
@@ -94,6 +96,8 @@ const createWindow = () => {
       contextIsolation: true,
       // 预加载脚本路径
       preload: path.join(__dirname, "preload.js"),
+      // 注意：在开发环境中，Vite 会处理 TypeScript 文件
+      // 但在生产环境中，文件会被编译成 JavaScript
     },
     // 处理图标路径，确保在开发和生产环境中都能正确加载
     icon: path.join(
