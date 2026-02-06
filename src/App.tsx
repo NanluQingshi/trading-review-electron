@@ -98,7 +98,7 @@ const AppContent: React.FC = () => {
           boxShadow: '0 1px 4px rgba(0,21,41,.08)',
           zIndex: 1
         }}>
-          <a href="https://github.com/NanluQingshi/trading-review-system" target="_blank" rel="noreferrer" style={{ color: '#000', fontSize: 20 }}>
+          <a href="https://github.com/NanluQingshi" target="_blank" rel="noreferrer" style={{ color: '#000', fontSize: 20 }}>
             <GithubOutlined />
           </a>
         </Header>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Space, Tag, Typography, Divider, Button, Tooltip } from 'antd';
 import { EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { Trade } from '../../types';
+import { Trade } from '@/types';
 
 const { Text } = Typography;
 

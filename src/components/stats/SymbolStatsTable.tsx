@@ -1,14 +1,6 @@
 import React from 'react';
 import { Card, Table } from 'antd';
-
-interface SymbolStat {
-  symbol: string;
-  totalTrades: number;
-  winCount: number;
-  totalProfit: number;
-  expectedProfit: number;
-  winRate: string;
-}
+import { SymbolStat } from '@/types';
 
 interface SymbolStatsTableProps {
   symbolStats: SymbolStat[];
@@ -35,7 +27,7 @@ const SymbolStatsTable: React.FC<SymbolStatsTableProps> = ({ symbolStats }) => {
       title: '胜率',
       dataIndex: 'winRate',
       key: 'winRate',
-      render: (rate: string) => `${rate}%`,
+      render: (rate: number) => `${(rate * 100).toFixed(2)}%`,
     },
     {
       title: '总盈亏',
@@ -49,11 +41,11 @@ const SymbolStatsTable: React.FC<SymbolStatsTableProps> = ({ symbolStats }) => {
     },
     {
       title: '总预期盈亏',
-      dataIndex: 'expectedProfit',
-      key: 'expectedProfit',
-      render: (expectedProfit: number) => (
-        <span className={expectedProfit > 0 ? 'profit-positive' : expectedProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
-          {expectedProfit > 0 ? '+' : ''}{expectedProfit}
+      dataIndex: 'totalExpectedProfit',
+      key: 'totalExpectedProfit',
+      render: (totalExpectedProfit: number) => (
+        <span className={totalExpectedProfit > 0 ? 'profit-positive' : totalExpectedProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
+          {totalExpectedProfit > 0 ? '+' : ''}{totalExpectedProfit}
         </span>
       ),
     },

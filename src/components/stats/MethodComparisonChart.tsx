@@ -1,11 +1,7 @@
 import React from 'react';
 import { Card } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-interface MethodStat {
-  methodName: string;
-  totalProfit: number;
-}
+import { MethodStat } from '@/types';
 
 interface MethodComparisonChartProps {
   methodStats: MethodStat[];

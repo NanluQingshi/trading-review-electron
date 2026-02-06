@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Row, Col } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import dayjs from 'dayjs';
-import { Method, Trade } from '../../types';
+import { Method, Trade } from '@/types';
 
 const { Option } = Select;
 

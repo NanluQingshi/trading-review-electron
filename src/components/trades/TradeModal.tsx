@@ -1,6 +1,14 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-05 21:57:01
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 21:18:23
+ * @Description: 
+ */
 import React from 'react';
 import { Modal, Form } from 'antd';
-import { Method, Trade } from '../../types';
+import dayjs from 'dayjs';
+import { Method, Trade } from '@/types';
 import TradeForm from './TradeForm';
 
 interface TradeFormValues {
@@ -8,8 +16,8 @@ interface TradeFormValues {
   direction: 'long' | 'short';
   entryPrice?: number | null;
   exitPrice?: number | null;
-  entryTime?: string | null;
-  exitTime?: string | null;
+  entryTime?: dayjs.Dayjs | null;
+  exitTime?: dayjs.Dayjs | null;
   lots?: number;
   profit?: number | null;
   expectedProfit?: number;
@@ -51,6 +59,7 @@ const TradeModal: React.FC<TradeModalProps> = ({
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      console.log('values', values);
       await onOk(values);
       form.resetFields();
     } catch (error) {

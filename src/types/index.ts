@@ -52,25 +52,24 @@ export interface Stats {
 
 export interface SymbolStat {
   symbol: string;
-  count: number;
-  wins: number;
-  profit: number;
-  expectedProfit: number;
-  winRate: string;
+  totalTrades: number;
+  winCount: number;
+  winRate: number;
+  totalProfit: number;
+  totalExpectedProfit: number;
 }
 
 export interface MethodStat {
   methodId: string;
   methodName: string;
-  count: number;
-  wins: number;
-  profit: number;
-  expectedProfit: number;
-  winRate: string;
+  totalTrades: number;
+  winCount: number;
+  winRate: number;
+  totalProfit: number;
+  totalExpectedProfit: number;
 }
 
 export interface ProfitPoint {
-  date: string;
-  profit: number;
-  cumulative: number;
+  time: string;
+  cumulativeProfit: number;
 }

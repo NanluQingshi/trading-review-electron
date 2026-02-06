@@ -1,22 +1,6 @@
-/*
- * @Author: NanluQingshi
- * @Date: 2026-02-05 21:57:01
- * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 22:43:49
- * @Description: 
- */
 import React from 'react';
 import { Card, Table } from 'antd';
-
-interface MethodStat {
-  methodId: string;
-  methodName: string;
-  totalTrades: number;
-  winCount: number;
-  totalProfit: number;
-  expectedProfit: number;
-  winRate: string;
-}
+import { MethodStat } from '@/types';
 
 interface MethodStatsTableProps {
   methodStats: MethodStat[];
@@ -43,7 +27,7 @@ const MethodStatsTable: React.FC<MethodStatsTableProps> = ({ methodStats }) => {
       title: '胜率',
       dataIndex: 'winRate',
       key: 'winRate',
-      render: (rate: string) => `${rate}%`,
+      render: (rate: number) => `${(rate * 100).toFixed(2)}%`,
     },
     {
       title: '总盈亏',
@@ -57,11 +41,11 @@ const MethodStatsTable: React.FC<MethodStatsTableProps> = ({ methodStats }) => {
     },
     {
       title: '总预期盈亏',
-      dataIndex: 'expectedProfit',
-      key: 'expectedProfit',
-      render: (expectedProfit: number) => (
-        <span className={expectedProfit > 0 ? 'profit-positive' : expectedProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
-          {expectedProfit > 0 ? '+' : ''}{expectedProfit}
+      dataIndex: 'totalExpectedProfit',
+      key: 'totalExpectedProfit',
+      render: (totalExpectedProfit: number) => (
+        <span className={totalExpectedProfit > 0 ? 'profit-positive' : totalExpectedProfit < 0 ? 'profit-negative' : 'profit-neutral'}>
+          {totalExpectedProfit > 0 ? '+' : ''}{totalExpectedProfit}
         </span>
       ),
     },

@@ -1,7 +1,14 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-05 21:57:01
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 21:20:43
+ * @Description: 
+ */
 import React from 'react';
 import { Card, Form, Input, Select, Button, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { Method } from '../../types';
+import { Method } from '@/types';
 
 const { Option } = Select;
 

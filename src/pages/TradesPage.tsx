@@ -86,6 +86,7 @@ const TradesPage: React.FC = () => {
 
   // 提交交易记录
   const handleSubmitTrade = async (values: TradeFormValues) => {
+    console.log('handle-values', values);
     setConfirmLoading(true);
     try {
       // 格式化日期字段
