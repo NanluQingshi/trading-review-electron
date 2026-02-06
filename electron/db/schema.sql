@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS trades (
   methodId TEXT,
   methodName TEXT NOT NULL,
   notes TEXT,
+  screenshot TEXT,
   tags TEXT DEFAULT '[]',
   result TEXT CHECK (result IN ('win', 'loss', 'breakeven')),
   FOREIGN KEY (methodId) REFERENCES methods(id) ON DELETE SET NULL

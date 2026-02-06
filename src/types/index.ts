@@ -13,7 +13,7 @@ export interface Method {
 export interface Trade {
   id: number;
   symbol: string;
-  direction: 'long' | 'short';
+  direction: "long" | "short";
   entryPrice?: number | null;
   exitPrice?: number | null;
   entryTime?: string | null;
@@ -24,8 +24,9 @@ export interface Trade {
   methodId: string;
   methodName: string;
   notes?: string;
+  screenshot?: string;
   tags?: string[];
-  result?: 'win' | 'loss' | 'breakeven';
+  result?: "win" | "loss" | "breakeven";
 }
 
 // 统计数据类型

@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-02-06 15:25:31
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 16:45:23
+ * @LastEditTime: 2026-02-06 20:00:00
  * @Description:
  */
 import { app } from "electron";
@@ -89,6 +89,7 @@ const createTables = () => {
         methodId TEXT,
         methodName TEXT NOT NULL,
         notes TEXT,
+        screenshot TEXT,
         tags TEXT DEFAULT '[]',
         result TEXT CHECK (result IN ('win', 'loss', 'breakeven')),
         FOREIGN KEY (methodId) REFERENCES methods(id) ON DELETE SET NULL
