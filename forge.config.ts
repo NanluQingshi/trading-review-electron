@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 21:29:23
+ * @LastEditTime: 2026-02-06 21:50:10
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -54,7 +54,9 @@ const config: ForgeConfig = {
     },
   },
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      setupIcon: path.join(__dirname, 'assets', 'favicon.ico'),
+    }),
     new MakerZIP({}, ["darwin", "win32"]),
     new MakerRpm({}),
     new MakerDeb({}),
