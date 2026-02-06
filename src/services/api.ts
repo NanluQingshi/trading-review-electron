@@ -2,49 +2,17 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 01:39:50
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-05 20:48:52
+ * @LastEditTime: 2026-02-06 20:00:30
  * @Description:
  */
-import { Method, Trade, Stats } from "../types";
-
-// 扩展Window接口，添加electron属性
-declare global {
-  interface Window {
-    electron: {
-      getAppVersion: () => Promise<string>;
-      trades: {
-        list: (filters?: any) => Promise<any>;
-        detail: (id: number) => Promise<any>;
-        create: (trade: any) => Promise<any>;
-        update: (id: number, trade: any) => Promise<any>;
-        delete: (id: number) => Promise<any>;
-      };
-      methods: {
-        list: () => Promise<any>;
-        detail: (id: string) => Promise<any>;
-        create: (method: any) => Promise<any>;
-        update: (id: string, method: any) => Promise<any>;
-        delete: (id: string) => Promise<any>;
-        getDefault: () => Promise<any>;
-        setDefault: (id: string) => Promise<any>;
-      };
-      stats: {
-        overall: () => Promise<any>;
-        methods: () => Promise<any>;
-        symbols: () => Promise<any>;
-        timePeriod: (period: "day" | "week" | "month") => Promise<any>;
-        profitCurve: () => Promise<any>;
-      };
-      on: (channel: string, callback: (...args: any[]) => void) => void;
-      off: (channel: string, callback: (...args: any[]) => void) => void;
-    };
-  }
-}
+import { Method, Trade } from "@/types";
 
 // 检查 window.electron 是否存在
 const ensureElectronExists = () => {
   if (!window.electron) {
-    throw new Error("Electron API not initialized. Please check if preload script is loaded correctly.");
+    throw new Error(
+      "Electron API not initialized. Please check if preload script is loaded correctly.",
+    );
   }
 };
 

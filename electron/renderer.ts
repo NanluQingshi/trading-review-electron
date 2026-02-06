@@ -32,8 +32,8 @@
  *  });
  * ```
  */
-import "../src/index";
-import "../styles/index.css";
+import "@/index";
+import "@styles/index.css";
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',

@@ -1,4 +1,4 @@
-import { initDatabase, getDb } from "../db/instance";
+import { initDatabase, getDb } from "@electron/db/instance";
 
 // 确保数据库初始化完成
 const ensureDatabaseInitialized = () => {

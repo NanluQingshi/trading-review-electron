@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, message } from 'antd';
-import { Trades } from '../components';
-import { useTrades, useMethods } from '../hooks';
-import { Trade } from '../types';
+import { Trades } from '@/components';
+import { useTrades, useMethods } from '@/hooks';
+import { Trade } from '@/types';
 
 import dayjs from 'dayjs';
 

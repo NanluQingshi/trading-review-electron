@@ -7,8 +7,8 @@
  */
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import { methodsApi } from "../services/api";
-import { Method } from "../types";
+import { methodsApi } from "@/services/api";
+import { Method } from "@/types";
 
 export const useMethods = () => {
   const [methods, setMethods] = useState<Method[]>([]);

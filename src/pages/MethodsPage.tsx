@@ -7,9 +7,9 @@ import {
   Spin,
   FloatButton
 } from 'antd';
-import { Methods } from '../components';
-import { useMethods } from '../hooks';
-import { Method } from '../types';
+import { Methods } from '@/components';
+import { useMethods } from '@/hooks';
+import { Method } from '@/types';
 
 const MethodsPage: React.FC = () => {
   // 使用自定义hooks

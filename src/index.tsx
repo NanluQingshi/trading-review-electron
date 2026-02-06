@@ -6,12 +6,12 @@
  * @使用条款：未经授权，不得复制、修改、分发或用于商业目的
  */
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import 'antd/dist/reset.css';
-import '../styles/index.css';
+import '@styles/index.css';
 
-const root = ReactDOM.createRoot(
+const root = createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(

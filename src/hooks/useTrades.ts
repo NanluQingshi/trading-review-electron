@@ -1,7 +1,14 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-06 15:25:31
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-06 20:03:53
+ * @Description:
+ */
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import { tradesApi } from "../services/api";
-import { Trade } from "../types";
+import { tradesApi } from "@/services/api";
+import { Trade } from "@/types";
 
 export const useTrades = () => {
   const [trades, setTrades] = useState<Trade[]>([]);

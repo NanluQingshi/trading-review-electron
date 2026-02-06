@@ -2,16 +2,16 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 16:50:20
+ * @LastEditTime: 2026-02-06 19:19:00
  * @Description:
  */
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import { initDatabase } from "./db/instance";
-import * as tradeHandlers from "./handlers/tradeHandlers";
-import * as methodHandlers from "./handlers/methodHandlers";
-import * as statsHandlers from "./handlers/statsHandlers";
+import { initDatabase } from "@electron/db/instance";
+import * as tradeHandlers from "@electron/handlers/tradeHandlers";
+import * as methodHandlers from "@electron/handlers/methodHandlers";
+import * as statsHandlers from "@electron/handlers/statsHandlers";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {

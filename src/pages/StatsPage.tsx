@@ -7,8 +7,8 @@
  */
 import React from 'react';
 import { Spin, Empty } from 'antd';
-import { Stats } from '../components';
-import { useStats } from '../hooks';
+import { Stats } from '@/components';
+import { useStats } from '@/hooks';
 
 const StatsPage: React.FC = () => {
   console.log('StatsPage rendered');

@@ -13,6 +13,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@electron/*": ["./electron/*"],
+      "@styles/*": ["./styles/*"]
+    }
   }
 }

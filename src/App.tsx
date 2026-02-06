@@ -18,7 +18,7 @@ import {
 import MethodsPage from './pages/MethodsPage';
 import TradesPage from './pages/TradesPage';
 import StatsPage from './pages/StatsPage';
-import '../styles/App.css';
+import '@styles/App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
 

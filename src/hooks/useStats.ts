@@ -7,8 +7,8 @@
  */
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import { statsApi } from "../services/api";
-import { Stats } from "../types";
+import { statsApi } from "@/services/api";
+import { Stats, SymbolStat, MethodStat } from "@/types";
 
 export const useStats = () => {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -50,16 +50,20 @@ export const useStats = () => {
           totalExpectedProfit: overallData?.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
           avgExpectedProfit: overallData?.avgExpectedProfit || 0, // 使用后端返回的avgExpectedProfit字段
         },
-        symbolStats: (symbolStatsData || []).map((stat) => ({
-          ...stat,
-          expectedProfit: stat.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
-          winRate: ((stat.winRate || 0) * 100).toString(), // 将小数转换为百分比字符串
-        })),
-        methodStats: (methodStatsData || []).map((stat) => ({
-          ...stat,
-          expectedProfit: stat.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
-          winRate: ((stat.winRate || 0) * 100).toString(), // 将小数转换为百分比字符串
-        })),
+        symbolStats: (symbolStatsData || []).map(
+          (stat: any): SymbolStat => ({
+            ...stat,
+            expectedProfit: stat.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
+            winRate: ((stat.winRate || 0) * 100).toString(), // 将小数转换为百分比字符串
+          }),
+        ),
+        methodStats: (methodStatsData || []).map(
+          (stat: any): MethodStat => ({
+            ...stat,
+            expectedProfit: stat.totalExpectedProfit || 0, // 使用后端返回的totalExpectedProfit字段
+            winRate: ((stat.winRate || 0) * 100).toString(), // 将小数转换为百分比字符串
+          }),
+        ),
         profitCurve: profitCurveData || [],
       };
 
