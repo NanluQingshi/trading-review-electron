@@ -6,7 +6,7 @@
  * @使用条款：未经授权，不得复制、修改、分发或用于商业目的
  */
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, ConfigProvider } from 'antd';
 import { 
   BookOutlined, 
