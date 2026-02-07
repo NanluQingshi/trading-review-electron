@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "v*"
+permissions:
+  contents: write      
 
 jobs:
   build:
@@ -37,16 +39,12 @@ jobs:
           npm run rebuild -- --force
         env:
           npm_config_runtime: electron
-          # 这里填你确认的 40.0.0
           npm_config_target: 40.0.0
           npm_config_disturl: https://electronjs.org/headers
 
       - name: Make (Build & Package)
         run: npm run make
 
-      # 👇 修正2：获取真实的 Electron 版本并 Rebuild
-      # 相比手动写死版本号，更推荐让 electron-rebuild 自动检测
-      # 或者如果你想手动指定，必须填写真实的版本号！
       - name: Rebuild Native Modules
         shell: bash
         run: |
@@ -62,22 +60,25 @@ jobs:
       - name: Make (Build & Package)
         run: npm run make
 
+      - name: List Output Files (Debug)
+        shell: bash
+        run: |
+          ls -R out || echo "out directory not found"
+
       - name: Upload Artifacts to Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          # 👇 修正4：为了保险，同时涵盖 dist 和 out 目录
-          # 因为如果不确定你的 forge 配置到底是 dist 还是 out，这样写最稳妥
           files: |
-            dist/make/**/*.zip
-            dist/make/**/*.dmg
-            dist/make/**/*.exe
-            dist/make/**/*.rpm
-            dist/make/**/*.deb
-            out/make/**/*.zip
-            out/make/**/*.dmg
-            out/make/**/*.exe
-            out/make/**/*.rpm
-            out/make/**/*.deb
+            dist/**/*.zip
+            dist/**/*.dmg
+            dist/**/*.exe
+            dist/**/*.rpm
+            dist/**/*.deb
+            out/**/*.zip
+            out/**/*.dmg
+            out/**/*.exe
+            out/**/*.rpm
+            out/**/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
