@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 14:06:19
+ * @LastEditTime: 2026-02-07 14:36:27
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -10,6 +10,7 @@ import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { MakerDeb } from "@electron-forge/maker-deb";
 import { MakerRpm } from "@electron-forge/maker-rpm";
+import { MakerDMG } from "@electron-forge/maker-dmg";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
@@ -55,6 +56,11 @@ const config: ForgeConfig = {
       setupIcon: './assets/icon.ico',
     }),
     new MakerZIP({}, ["darwin", "win32"]),
+    new MakerDMG({
+      icon: './assets/icon.icns',
+      name: 'Trading Review',
+      format: 'ULFO',
+    }),
     new MakerRpm({}),
     new MakerDeb({}),
   ],
