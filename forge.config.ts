@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 14:55:27
+ * @LastEditTime: 2026-02-07 15:00:00
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -22,7 +22,22 @@ const config: ForgeConfig = {
   outDir: "dist",
   packagerConfig: {
     asar: true,
+    icon: path.resolve(__dirname, "assets/icon"),
   },
+  makers: [
+    new MakerSquirrel({
+      setupIcon: "./assets/icon.ico",
+    }),
+    new MakerZIP({}, ["darwin", "win32"]),
+    new MakerDMG({
+      icon: "./assets/icon.icns",
+      name: "TradingReview",
+      title: "Trading Review",
+      overwrite: true,
+    }),
+    new MakerRpm({}),
+    new MakerDeb({}),
+  ],
   hooks: {
     packageAfterPrune: async (_config, buildPath) => {
       // 我们需要手动复制的模块列表
@@ -51,20 +66,6 @@ const config: ForgeConfig = {
       }
     },
   },
-  makers: [
-    new MakerSquirrel({
-      setupIcon: "./assets/icon.ico",
-    }),
-    new MakerZIP({}, ["darwin", "win32"]),
-    new MakerDMG({
-      icon: "./assets/icon.icns",
-      name: "TradingReview",
-      title: "Trading Review",
-      overwrite: true,
-    }),
-    new MakerRpm({}),
-    new MakerDeb({}),
-  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new VitePlugin({

@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 19:19:00
+ * @LastEditTime: 2026-02-07 15:02:22
  * @Description:
  */
 import { app, BrowserWindow, ipcMain } from "electron";
@@ -111,8 +111,10 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (process.env.NODE_ENV === "development") {
+    // 开发环境下，打开 DevTools
+    mainWindow.webContents.openDevTools();
+  }
 };
 
 // This method will be called when Electron has finished
