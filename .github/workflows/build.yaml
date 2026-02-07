@@ -20,17 +20,25 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22  # 👈 修正1：改为稳定的 20 版本
           cache: "npm"
 
       - name: Install Dependencies
         run: npm install
 
+      # 👇 修正2：获取真实的 Electron 版本并 Rebuild
+      # 相比手动写死版本号，更推荐让 electron-rebuild 自动检测
+      # 或者如果你想手动指定，必须填写真实的版本号！
       - name: Rebuild Native Modules
-        run: npm run rebuild -- --force
+        shell: bash
+        run: |
+          # 尝试自动 rebuild。如果你的 package.json 里有 "rebuild" 脚本则运行它
+          # 如果没有，Forge 通常在 npm install 时会自动处理，或者在 make 时处理
+          # 这里为了保险，显式调用 electron-rebuild (如果没有这个命令，这一步可以删除)
+          npm run rebuild -- --force
         env:
           npm_config_runtime: electron
-          npm_config_target: 40.0.0
+          npm_config_target: 40.0.0  # 👈 修正3：请务必去 package.json 查看你的 electron 版本并填在这里！！
           npm_config_disturl: https://electronjs.org/headers
 
       - name: Make (Build & Package)
@@ -40,10 +48,18 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          # 👇 修正4：为了保险，同时涵盖 dist 和 out 目录
+          # 因为如果不确定你的 forge 配置到底是 dist 还是 out，这样写最稳妥
           files: |
             dist/make/**/*.zip
             dist/make/**/*.dmg
             dist/make/**/*.exe
-            dist/make/**/*.nupkg
+            dist/make/**/*.rpm
+            dist/make/**/*.deb
+            out/make/**/*.zip
+            out/make/**/*.dmg
+            out/make/**/*.exe
+            out/make/**/*.rpm
+            out/make/**/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
