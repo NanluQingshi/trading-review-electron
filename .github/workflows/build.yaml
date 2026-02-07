@@ -20,7 +20,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22  # 👈 修正1：改为稳定的 20 版本
+          node-version: 20  
           cache: "npm"
 
       - name: Install Dependencies
