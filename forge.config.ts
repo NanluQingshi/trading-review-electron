@@ -32,7 +32,7 @@ const config: ForgeConfig = {
     new MakerDMG({
       icon: "./assets/icon.icns",
       name: "TradingReview",
-      title: "Trading Review",
+      title: "TradingReview",
       overwrite: true,
     }),
     new MakerRpm({}),

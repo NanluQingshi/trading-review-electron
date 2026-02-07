@@ -61,7 +61,7 @@ const AppContent: React.FC = () => {
           borderBottom: '1px solid #f0f0f0'
         }}>
           <DashboardOutlined style={{ fontSize: 24, color: '#1677ff', marginRight: collapsed ? 0 : 8 }} />
-          {!collapsed && <span style={{ fontSize: 16, fontWeight: 'bold', color: '#1f1f1f' }}>交易复盘系统</span>}
+          {!collapsed && <span style={{ fontSize: 16, fontWeight: 'bold', color: '#1f1f1f' }}>TradingReview</span>}
         </div>
         <Menu
           theme="light"
@@ -118,7 +118,7 @@ const AppContent: React.FC = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center', color: '#8c8c8c' }}>
-          Trading Review System ©2026 Created by NanluQingshi
+          TradingReview ©2026 Created by NanluQingshi
         </Footer>
       </Layout>
     </Layout>

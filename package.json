@@ -1,6 +1,6 @@
 {
-  "name": "trading-review-electron",
-  "productName": "trading-review",
+  "name": "trading-review",
+  "productName": "TradingReview",
   "version": "1.0.0",
   "description": "A Trading Review Electron Application",
   "main": ".vite/build/main.js",
