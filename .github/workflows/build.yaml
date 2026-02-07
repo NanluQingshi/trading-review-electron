@@ -20,11 +20,29 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20  
+          # 🟢 关键点 1：必须强制使用 Node 20 (LTS)
+          # Node 22/24 在 Windows CI 上安装 Electron 极易崩溃
+          node-version: 20
           cache: "npm"
 
       - name: Install Dependencies
-        run: npm install
+        # 🟢 关键点 2：使用 'npm ci' 而不是 'npm install'
+        # 'npm ci' 是专门为 CI 设计的（Clean Install），它会直接读取 package-lock.json
+        # 速度更快，且能避免因 node_modules 缓存锁死导致的 EBUSY/EPERM 错误
+        run: npm ci
+
+      - name: Rebuild Native Modules
+        shell: bash
+        run: |
+          npm run rebuild -- --force
+        env:
+          npm_config_runtime: electron
+          # 这里填你确认的 40.0.0
+          npm_config_target: 40.0.0
+          npm_config_disturl: https://electronjs.org/headers
+
+      - name: Make (Build & Package)
+        run: npm run make
 
       # 👇 修正2：获取真实的 Electron 版本并 Rebuild
       # 相比手动写死版本号，更推荐让 electron-rebuild 自动检测
