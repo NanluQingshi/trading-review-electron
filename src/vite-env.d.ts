@@ -25,8 +25,17 @@ interface Window {
       overall: () => Promise<any>;
       methods: () => Promise<any>;
       symbols: () => Promise<any>;
-      timePeriod: (period: 'day' | 'week' | 'month') => Promise<any>;
+      timePeriod: (period: "day" | "week" | "month") => Promise<any>;
       profitCurve: () => Promise<any>;
+    };
+    settings: {
+      getDataPath: () => Promise<string | null>;
+      setDataPath: (dataPath: string) => Promise<boolean>;
+      clearDataPath: () => Promise<boolean>;
+      selectDataPath: () => Promise<string | null>;
+      migrateData: (
+        newPath: string,
+      ) => Promise<{ success: boolean; message: string }>;
     };
   };
 }

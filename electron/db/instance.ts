@@ -9,33 +9,34 @@ import { app } from "electron";
 import path from "path";
 import fs from "fs";
 import { createRequire } from "module";
+import { getDataPath } from "@electron/config";
 
-// 创建 require 函数
 const require = createRequire(import.meta.url);
 
-// 数据库实例
 let db: any = null;
 
-// 初始化数据库
 export const initDatabase = () => {
   try {
-    // 加载 better-sqlite3 模块
     const Database = require("better-sqlite3");
 
-    // 使用 userData 目录存储数据库文件（可写目录）
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, "trading.db");
+    const customDataPath = getDataPath();
+    let dbPath: string;
+
+    if (customDataPath) {
+      dbPath = path.join(customDataPath, "trading.db");
+    } else {
+      const userDataPath = app.getPath("userData");
+      dbPath = path.join(userDataPath, "trading.db");
+    }
+
     const dbDir = path.dirname(dbPath);
 
-    // 确保目录存在
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    // 连接数据库
     db = new Database(dbPath);
 
-    // 创建表结构
     createTables();
 
     return db;

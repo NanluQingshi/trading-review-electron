@@ -13,11 +13,13 @@ import {
   LineChartOutlined, 
   BarChartOutlined,
   DashboardOutlined,
-  GithubOutlined
+  GithubOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import MethodsPage from './pages/MethodsPage';
 import TradesPage from './pages/TradesPage';
 import StatsPage from './pages/StatsPage';
+import SettingsPage from './pages/SettingsPage';
 import '@styles/App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -32,6 +34,7 @@ const AppContent: React.FC = () => {
     if (path === '/') return 'methods';
     if (path === '/trades') return 'trades';
     if (path === '/stats') return 'stats';
+    if (path === '/settings') return 'settings';
     return 'methods';
   };
 
@@ -83,6 +86,11 @@ const AppContent: React.FC = () => {
               icon: <BarChartOutlined />,
               label: <Link to="/stats">我的统计</Link>,
             },
+            {
+              key: 'settings',
+              icon: <SettingOutlined />,
+              label: <Link to="/settings">设置</Link>,
+            },
           ]}
         />
       </Sider>
@@ -114,6 +122,7 @@ const AppContent: React.FC = () => {
               <Route path="/" element={<MethodsPage />} />
               <Route path="/trades" element={<TradesPage />} />
               <Route path="/stats" element={<StatsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           </div>
         </Content>

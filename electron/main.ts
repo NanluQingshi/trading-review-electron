@@ -7,11 +7,13 @@
  */
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "node:path";
+import fs from "node:fs";
 import started from "electron-squirrel-startup";
 import { initDatabase } from "@electron/db/instance";
 import * as tradeHandlers from "@electron/handlers/tradeHandlers";
 import * as methodHandlers from "@electron/handlers/methodHandlers";
 import * as statsHandlers from "@electron/handlers/statsHandlers";
+import { getDataPath, setDataPath, clearDataPath } from "@electron/config";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -127,6 +129,50 @@ const registerIpcHandlers = () => {
 
   // 应用相关的IPC处理函数
   ipcMain.handle("app:version", () => app.getVersion());
+
+  // 数据路径相关的IPC处理函数
+  ipcMain.handle("settings:get-data-path", () => getDataPath());
+  ipcMain.handle("settings:set-data-path", (_, dataPath) => {
+    setDataPath(dataPath);
+    return true;
+  });
+  ipcMain.handle("settings:clear-data-path", () => clearDataPath());
+  ipcMain.handle("settings:select-data-path", async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory", "createDirectory"],
+      title: "选择数据存储位置",
+    });
+    if (result.filePaths && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+    return null;
+  });
+  ipcMain.handle("settings:migrate-data", async (_, newPath) => {
+    try {
+      const oldPath = app.getPath("userData");
+      const oldDbPath = path.join(oldPath, "trading.db");
+      const newDbPath = path.join(newPath, "trading.db");
+
+      if (!fs.existsSync(oldDbPath)) {
+        return { success: false, message: "未找到旧数据文件" };
+      }
+
+      if (fs.existsSync(newDbPath)) {
+        return { success: false, message: "目标位置已存在数据文件" };
+      }
+
+      const newDir = path.dirname(newDbPath);
+      if (!fs.existsSync(newDir)) {
+        fs.mkdirSync(newDir, { recursive: true });
+      }
+
+      fs.copyFileSync(oldDbPath, newDbPath);
+      return { success: true, message: "数据迁移成功" };
+    } catch (error) {
+      console.error("数据迁移失败:", error);
+      return { success: false, message: "数据迁移失败: " + error };
+    }
+  });
 };
 
 const createWindow = () => {
