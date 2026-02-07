@@ -2,10 +2,10 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 15:02:22
+ * @LastEditTime: 2026-02-07 15:34:55
  * @Description:
  */
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { initDatabase } from "@electron/db/instance";
@@ -17,6 +17,59 @@ import * as statsHandlers from "@electron/handlers/statsHandlers";
 if (started) {
   app.quit();
 }
+
+// 硬编码的过期日期配置
+const EXPIRE_DATE = new Date("2026-02-14T00:00:00");
+
+// 定期检查间隔（5分钟）
+const CHECK_INTERVAL = 5 * 60 * 1000;
+
+// 检查应用是否过期
+const checkAppExpiration = () => {
+  const now = new Date();
+
+  if (now >= EXPIRE_DATE) {
+    return false;
+  }
+  return true;
+};
+
+// 显示过期提示并退出应用
+const showExpirationDialog = () => {
+  dialog.showMessageBoxSync({
+    type: "error",
+    title: "应用已过期",
+    message: "试用版本已过期",
+    detail:
+      "感谢您试用本应用。您的试用版本已过期，请联系开发者获取正式版本。\n\n联系方式：\n邮箱：nanluqingshi@gmail.com",
+    buttons: ["退出"],
+    defaultId: 0,
+  });
+
+  app.quit();
+};
+
+// 定期检查应用是否过期
+let expirationCheckTimer: NodeJS.Timeout | null = null;
+
+const startPeriodicExpirationCheck = () => {
+  if (expirationCheckTimer) {
+    clearInterval(expirationCheckTimer);
+  }
+
+  expirationCheckTimer = setInterval(() => {
+    if (!checkAppExpiration()) {
+      showExpirationDialog();
+    }
+  }, CHECK_INTERVAL);
+};
+
+const stopPeriodicExpirationCheck = () => {
+  if (expirationCheckTimer) {
+    clearInterval(expirationCheckTimer);
+    expirationCheckTimer = null;
+  }
+};
 
 // 初始化应用
 const initializeApp = () => {
@@ -97,8 +150,8 @@ const createWindow = () => {
     icon: path.join(
       __dirname,
       process.env.NODE_ENV === "development"
-        ? "../assets/logo.png"
-        : "./assets/logo.png",
+        ? "../assets/icon"
+        : "./assets/icon",
     ),
   });
 
@@ -121,6 +174,12 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
+  // 检查应用是否过期
+  if (!checkAppExpiration()) {
+    showExpirationDialog();
+    return;
+  }
+
   // 初始化应用
   initializeApp();
 
@@ -129,15 +188,23 @@ app.on("ready", () => {
 
   // 创建应用窗口
   createWindow();
+
+  // 启动定期过期检查
+  startPeriodicExpirationCheck();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
+  stopPeriodicExpirationCheck();
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+app.on("before-quit", () => {
+  stopPeriodicExpirationCheck();
 });
 
 app.on("activate", () => {
