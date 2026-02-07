@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 15:34:55
+ * @LastEditTime: 2026-02-07 15:40:36
  * @Description:
  */
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
@@ -21,8 +21,8 @@ if (started) {
 // 硬编码的过期日期配置
 const EXPIRE_DATE = new Date("2026-02-14T00:00:00");
 
-// 定期检查间隔（5分钟）
-const CHECK_INTERVAL = 5 * 60 * 1000;
+// 定期检查间隔（12小时）
+const CHECK_INTERVAL = 12 * 60 * 60 * 1000;
 
 // 检查应用是否过期
 const checkAppExpiration = () => {
