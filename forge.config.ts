@@ -13,7 +13,7 @@ import { MakerRpm } from "@electron-forge/maker-rpm";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
-import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
+import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import path from "path";
 import fs from "fs";
 
@@ -25,14 +25,10 @@ const config: ForgeConfig = {
   hooks: {
     packageAfterPrune: async (_config, buildPath) => {
       // 我们需要手动复制的模块列表
-      const modulesToCopy = [
-        'better-sqlite3',
-        'bindings',
-        'file-uri-to-path' 
-      ];
+      const modulesToCopy = ["better-sqlite3", "bindings", "file-uri-to-path"];
 
-      const sourceBase = path.join(process.cwd(), 'node_modules');
-      const destBase = path.join(buildPath, 'node_modules');
+      const sourceBase = path.join(process.cwd(), "node_modules");
+      const destBase = path.join(buildPath, "node_modules");
 
       // 确保目标 node_modules 目录存在
       if (!fs.existsSync(destBase)) {
@@ -47,15 +43,16 @@ const config: ForgeConfig = {
           // 递归复制
           fs.cpSync(sourcePath, destPath, { recursive: true, force: true });
         } else {
-          console.warn(`   ⚠️ 警告: 在源 node_modules 中找不到 ${moduleName}，可能导致运行报错。`);
+          console.warn(
+            `   ⚠️ 警告: 在源 node_modules 中找不到 ${moduleName}，可能导致运行报错。`,
+          );
         }
       }
-      
     },
   },
   makers: [
     new MakerSquirrel({
-      setupIcon: path.join(__dirname, 'assets', 'favicon.ico'),
+      setupIcon: path.join(__dirname, "assets", "icon.ico"),
     }),
     new MakerZIP({}, ["darwin", "win32"]),
     new MakerRpm({}),
