@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 14:36:27
+ * @LastEditTime: 2026-02-07 14:55:27
  * @Description:
  */
 import type { ForgeConfig } from "@electron-forge/shared-types";
@@ -53,13 +53,14 @@ const config: ForgeConfig = {
   },
   makers: [
     new MakerSquirrel({
-      setupIcon: './assets/icon.ico',
+      setupIcon: "./assets/icon.ico",
     }),
     new MakerZIP({}, ["darwin", "win32"]),
     new MakerDMG({
-      icon: './assets/icon.icns',
-      name: 'Trading Review',
-      format: 'ULFO',
+      icon: "./assets/icon.icns",
+      name: "TradingReview",
+      title: "Trading Review",
+      overwrite: true,
     }),
     new MakerRpm({}),
     new MakerDeb({}),

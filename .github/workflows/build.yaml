@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
 permissions:
-  contents: write      
+  contents: write
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: "npm"
 
       - name: Install Dependencies
@@ -52,7 +52,7 @@ jobs:
           npm run rebuild -- --force
         env:
           npm_config_runtime: electron
-          npm_config_target: 40.0.0  # 👈 修正3：请务必去 package.json 查看你的 electron 版本并填在这里！！
+          npm_config_target: 40.0.0 # 👈 修正3：请务必去 package.json 查看你的 electron 版本并填在这里！！
           npm_config_disturl: https://electronjs.org/headers
 
       - name: Make (Build & Package)
