@@ -13,7 +13,6 @@ import {
   LineChartOutlined, 
   BarChartOutlined,
   DashboardOutlined,
-  GithubOutlined,
   SettingOutlined
 } from '@ant-design/icons';
 import MethodsPage from './pages/MethodsPage';
@@ -36,6 +35,16 @@ const AppContent: React.FC = () => {
     if (path === '/stats') return 'stats';
     if (path === '/settings') return 'settings';
     return 'methods';
+  };
+
+  // 根据当前路径获取页面名称
+  const getCurrentPathName = () => {
+    const path = location.pathname;
+    if (path === '/') return 'Method 库';
+    if (path === '/trades') return '交易复盘';
+    if (path === '/stats') return '我的统计';
+    if (path === '/settings') return '设置';
+    return 'TradingReview';
   };
 
   return (
@@ -102,13 +111,13 @@ const AppContent: React.FC = () => {
           background: '#fff', 
           display: 'flex', 
           alignItems: 'center', 
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           boxShadow: '0 1px 4px rgba(0,21,41,.08)',
           zIndex: 1
         }}>
-          <a href="https://github.com/NanluQingshi" target="_blank" rel="noreferrer" style={{ color: '#000', fontSize: 20 }}>
-            <GithubOutlined />
-          </a>
+          <div style={{ fontSize: 14, color: '#666' }}>
+            {getCurrentPathName()}
+          </div>
         </Header>
         <Content style={{ margin: '80px 16px', overflow: 'initial' }}>
           <div style={{ 
