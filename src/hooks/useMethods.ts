@@ -90,6 +90,23 @@ export const useMethods = () => {
     fetchMethods();
   }, []);
 
+  // 批量删除交易方法
+  const deleteMethods = async (ids: string[]) => {
+    try {
+      const response = await methodsApi.deleteMethods(ids);
+      if (response && response.success) {
+        message.success(`成功删除 ${response.count || 0} 个方法`);
+        fetchMethods();
+      } else {
+        message.error(response?.message || '批量删除失败');
+        throw new Error('批量删除失败');
+      }
+    } catch (error) {
+      message.error('批量删除失败');
+      throw error;
+    }
+  };
+
   return {
     methods,
     loading,
@@ -97,5 +114,6 @@ export const useMethods = () => {
     createMethod,
     updateMethod,
     deleteMethod,
+    deleteMethods,
   };
 };

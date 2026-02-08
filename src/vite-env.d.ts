@@ -11,6 +11,7 @@ interface Window {
       create: (trade: any) => Promise<any>;
       update: (id: number, trade: any) => Promise<any>;
       delete: (id: number) => Promise<any>;
+      deleteBatch: (ids: number[]) => Promise<any>;
     };
     methods: {
       list: () => Promise<any>;
@@ -18,6 +19,7 @@ interface Window {
       create: (method: any) => Promise<any>;
       update: (id: string, method: any) => Promise<any>;
       delete: (id: string) => Promise<any>;
+      deleteBatch: (ids: string[]) => Promise<any>;
       getDefault: () => Promise<any>;
       setDefault: (id: string) => Promise<any>;
     };

@@ -15,7 +15,8 @@ import {
   Statistic, 
   Space, 
   Tooltip, 
-  Popconfirm 
+  Popconfirm,
+  Checkbox
 } from 'antd';
 import { 
   EditOutlined, 
@@ -32,13 +33,20 @@ interface MethodCardProps {
   method: Method;
   onEdit: (method: Method) => void;
   onDelete: (id: string) => void;
+  selected: boolean;
+  onSelect: (checked: boolean) => void;
 }
 
-const MethodCard: React.FC<MethodCardProps> = ({ method, onEdit, onDelete }) => {
+const MethodCard: React.FC<MethodCardProps> = ({ method, onEdit, onDelete, selected, onSelect }) => {
   return (
     <Card 
       hoverable
       actions={[
+        <Checkbox 
+          key="select" 
+          checked={selected}
+          onChange={(e) => onSelect(e.target.checked)}
+        />,
         <Tooltip title="编辑"><EditOutlined key="edit" onClick={() => onEdit(method)} /></Tooltip>,
         <Popconfirm title="确定删除吗？" onConfirm={() => onDelete(method.id)}>
           <Tooltip title="删除"><DeleteOutlined key="delete" style={{ color: '#ff4d4f' }} /></Tooltip>

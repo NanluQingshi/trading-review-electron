@@ -12,9 +12,19 @@ interface TradesTableProps {
   onEdit: (trade: Trade) => void;
   onDelete: (id: number) => void;
   onCopy: (trade: Trade) => void;
+  selectedRowKeys?: React.Key[];
+  onSelectionChange?: (selectedRowKeys: React.Key[]) => void;
 }
 
-const TradesTable: React.FC<TradesTableProps> = ({ trades, loading, onEdit, onDelete, onCopy }) => {
+const TradesTable: React.FC<TradesTableProps> = ({ 
+  trades, 
+  loading, 
+  onEdit, 
+  onDelete, 
+  onCopy,
+  selectedRowKeys = [],
+  onSelectionChange
+}) => {
   const columns = [
     {
       title: '交易品种',
@@ -134,6 +144,10 @@ const TradesTable: React.FC<TradesTableProps> = ({ trades, loading, onEdit, onDe
       dataSource={trades} 
       rowKey="id" 
       loading={loading}
+      rowSelection={{
+        selectedRowKeys,
+        onChange: onSelectionChange,
+      }}
       pagination={{
         pageSize: 10,
         showTotal: (total) => `共 ${total} 条记录`,

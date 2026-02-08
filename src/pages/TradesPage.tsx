@@ -31,13 +31,16 @@ interface FilterValues {
 
 const TradesPage: React.FC = () => {
   // 使用自定义hooks
-  const { trades, loading, fetchTrades, createTrade, updateTrade, deleteTrade } = useTrades();
+  const { trades, loading, fetchTrades, createTrade, updateTrade, deleteTrade, deleteTrades } = useTrades();
   const { methods } = useMethods();
 
   // 模态框状态
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // 批量选择状态
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 打开新增交易模态框
   const handleAddTrade = () => {
@@ -67,6 +70,35 @@ const TradesPage: React.FC = () => {
         }
       },
     });
+  };
+
+  // 批量删除交易
+  const handleBatchDelete = async () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning('请选择要删除的交易记录');
+      return;
+    }
+    
+    try {
+      await deleteTrades(selectedRowKeys as number[]);
+      setSelectedRowKeys([]);
+    } catch (error) {
+      console.error('Batch Delete Failed:', error);
+    }
+  };
+
+  // 选择/取消选择
+  const handleSelectionChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  // 全选/取消全选
+  const handleSelectAll = () => {
+    setSelectedRowKeys(trades.map(trade => trade.id));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedRowKeys([]);
   };
 
   // 复制交易
@@ -119,7 +151,13 @@ const TradesPage: React.FC = () => {
   return (
     <div className="trades-page">
       {/* 页面头部 */}
-      <Trades.TradesHeader onAddTrade={handleAddTrade} />
+      <Trades.TradesHeader 
+        onAddTrade={handleAddTrade}
+        selectedCount={selectedRowKeys.length}
+        onSelectAll={handleSelectAll}
+        onDeselectAll={handleDeselectAll}
+        onBatchDelete={handleBatchDelete}
+      />
 
       {/* 筛选表单 */}
       <Trades.TradesFilter methods={methods} onFilter={handleFilterTrades} />
@@ -131,6 +169,8 @@ const TradesPage: React.FC = () => {
         onEdit={handleEditTrade}
         onDelete={handleDeleteTrade}
         onCopy={handleCopyTrade}
+        selectedRowKeys={selectedRowKeys}
+        onSelectionChange={handleSelectionChange}
       />
 
       {/* 交易模态框 */}

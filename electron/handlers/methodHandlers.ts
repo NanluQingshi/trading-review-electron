@@ -126,6 +126,22 @@ export const deleteMethod = (id: string) => {
   }
 };
 
+// 批量删除策略方法
+export const deleteMethods = (ids: string[]) => {
+  try {
+    if (ids.length === 0) {
+      return { success: false, message: "请选择要删除的策略方法" };
+    }
+    
+    const placeholders = ids.map(() => '?').join(',');
+    runQuery(`DELETE FROM methods WHERE id IN (${placeholders})`, ids);
+    return { success: true, count: ids.length };
+  } catch (error) {
+    console.error("批量删除策略方法失败:", error);
+    return { success: false, message: (error as Error).message };
+  }
+};
+
 // 获取单个策略方法
 export const getMethod = (id: string) => {
   try {

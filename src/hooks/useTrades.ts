@@ -70,6 +70,23 @@ export const useTrades = () => {
     fetchTrades();
   }, []);
 
+  // 批量删除交易记录
+  const deleteTrades = async (ids: number[]) => {
+    try {
+      const response = await tradesApi.deleteTrades(ids);
+      if (response && response.success) {
+        message.success(`成功删除 ${response.count || 0} 条交易记录`);
+        fetchTrades();
+      } else {
+        message.error(response?.message || '批量删除失败');
+        throw new Error('批量删除失败');
+      }
+    } catch (error) {
+      message.error('批量删除失败');
+      throw error;
+    }
+  };
+
   return {
     trades,
     loading,
@@ -77,5 +94,6 @@ export const useTrades = () => {
     createTrade,
     updateTrade,
     deleteTrade,
+    deleteTrades,
   };
 };

@@ -97,6 +97,9 @@ const registerIpcHandlers = () => {
     tradeHandlers.updateTrade(id, trade),
   );
   ipcMain.handle("trades:delete", (_, id) => tradeHandlers.deleteTrade(id));
+  ipcMain.handle("trades:delete-batch", (_, ids) =>
+    tradeHandlers.deleteTrades(ids),
+  );
 
   // 清理脏数据
   if (methodHandlers.cleanupDirtyMethods) {
@@ -113,6 +116,9 @@ const registerIpcHandlers = () => {
     methodHandlers.updateMethod(id, method),
   );
   ipcMain.handle("methods:delete", (_, id) => methodHandlers.deleteMethod(id));
+  ipcMain.handle("methods:delete-batch", (_, ids) =>
+    methodHandlers.deleteMethods(ids),
+  );
   ipcMain.handle("methods:default", () => methodHandlers.getDefaultMethod());
   ipcMain.handle("methods:set-default", (_, id) =>
     methodHandlers.setDefaultMethod(id),

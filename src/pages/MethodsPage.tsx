@@ -5,7 +5,9 @@ import {
   Form,
   Empty,
   Spin,
-  FloatButton
+  FloatButton,
+  Modal,
+  message
 } from 'antd';
 import { Methods } from '@/components';
 import { useMethods } from '@/hooks';
@@ -13,13 +15,17 @@ import { Method } from '@/types';
 
 const MethodsPage: React.FC = () => {
   // 使用自定义hooks
-  const { methods, loading, createMethod, updateMethod, deleteMethod } = useMethods();
+  const { methods, loading, createMethod, updateMethod, deleteMethod, deleteMethods } = useMethods();
   
   // 模态框状态
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingMethod, setEditingMethod] = useState<Method | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  
+  // 批量选择状态
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showBatchDeleteModal, setShowBatchDeleteModal] = useState(false);
 
   // 打开新增方法模态框
   const handleAddMethod = () => {
@@ -44,6 +50,41 @@ const MethodsPage: React.FC = () => {
     }
   };
 
+  // 批量删除方法
+  const handleBatchDelete = async () => {
+    if (selectedIds.length === 0) {
+      message.warning('请选择要删除的方法');
+      return;
+    }
+    
+    try {
+      await deleteMethods(selectedIds);
+      setSelectedIds([]);
+      // 关闭批量删除确认对话框
+      setShowBatchDeleteModal(false);
+    } catch (error) {
+      console.error('Batch Delete Failed:', error);
+    }
+  };
+
+  // 选择/取消选择
+  const handleSelectMethod = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+    }
+  };
+
+  // 全选/取消全选
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(methods.map(method => method.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
   // 提交方法表单
   const handleSubmitMethod = async (values: { code: string; name: string; description: string }) => {
     setConfirmLoading(true);
@@ -64,7 +105,13 @@ const MethodsPage: React.FC = () => {
   return (
     <div className="methods-page">
       {/* 页面头部 */}
-      <Methods.MethodsHeader onAddMethod={handleAddMethod} />
+      <Methods.MethodsHeader 
+        onAddMethod={handleAddMethod} 
+        selectedCount={selectedIds.length}
+        onSelectAll={() => handleSelectAll(true)}
+        onDeselectAll={() => handleSelectAll(false)}
+        onBatchDelete={() => setShowBatchDeleteModal(true)}
+      />
 
       <Spin spinning={loading} tip="加载方法库中...">
         <div style={{ minHeight: '400px' }}>
@@ -77,7 +124,9 @@ const MethodsPage: React.FC = () => {
                   <Methods.MethodCard 
                     method={method} 
                     onEdit={handleEditMethod} 
-                    onDelete={handleDeleteMethod} 
+                    onDelete={handleDeleteMethod}
+                    selected={selectedIds.includes(method.id)}
+                    onSelect={(checked) => handleSelectMethod(method.id, checked)}
                   />
                 </Col>
               ))}
@@ -96,6 +145,19 @@ const MethodsPage: React.FC = () => {
         onOk={handleSubmitMethod}
         form={form}
       />
+
+      {/* 批量删除确认对话框 */}
+      <Modal
+        title="确认删除"
+        open={showBatchDeleteModal}
+        onOk={handleBatchDelete}
+        onCancel={() => setShowBatchDeleteModal(false)}
+        okText="删除"
+        cancelText="取消"
+      >
+        <p>确定要删除选中的 <strong>{selectedIds.length}</strong> 个方法吗？</p>
+        <p style={{ color: '#ff4d4f' }}>此操作不可恢复，请谨慎操作。</p>
+      </Modal>
 
       <FloatButton.BackTop visibilityHeight={200} />
     </div>

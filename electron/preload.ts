@@ -15,6 +15,7 @@ interface ElectronAPI {
     create: (trade: any) => Promise<any>;
     update: (id: number, trade: any) => Promise<any>;
     delete: (id: number) => Promise<any>;
+    deleteBatch: (ids: number[]) => Promise<any>;
   };
 
   // 策略方法相关
@@ -24,6 +25,7 @@ interface ElectronAPI {
     create: (method: any) => Promise<any>;
     update: (id: string, method: any) => Promise<any>;
     delete: (id: string) => Promise<any>;
+    deleteBatch: (ids: string[]) => Promise<any>;
     getDefault: () => Promise<any>;
     setDefault: (id: string) => Promise<any>;
   };
@@ -66,6 +68,8 @@ contextBridge.exposeInMainWorld("electron", {
     update: (id: number, trade: any) =>
       ipcRenderer.invoke("trades:update", id, trade),
     delete: (id: number) => ipcRenderer.invoke("trades:delete", id),
+    deleteBatch: (ids: number[]) =>
+      ipcRenderer.invoke("trades:delete-batch", ids),
   },
 
   // 策略方法相关
@@ -76,6 +80,8 @@ contextBridge.exposeInMainWorld("electron", {
     update: (id: string, method: any) =>
       ipcRenderer.invoke("methods:update", id, method),
     delete: (id: string) => ipcRenderer.invoke("methods:delete", id),
+    deleteBatch: (ids: string[]) =>
+      ipcRenderer.invoke("methods:delete-batch", ids),
     getDefault: () => ipcRenderer.invoke("methods:default"),
     setDefault: (id: string) => ipcRenderer.invoke("methods:set-default", id),
   },
@@ -93,10 +99,12 @@ contextBridge.exposeInMainWorld("electron", {
   // 设置相关
   settings: {
     getDataPath: () => ipcRenderer.invoke("settings:get-data-path"),
-    setDataPath: (dataPath: string) => ipcRenderer.invoke("settings:set-data-path", dataPath),
+    setDataPath: (dataPath: string) =>
+      ipcRenderer.invoke("settings:set-data-path", dataPath),
     clearDataPath: () => ipcRenderer.invoke("settings:clear-data-path"),
     selectDataPath: () => ipcRenderer.invoke("settings:select-data-path"),
-    migrateData: (newPath: string) => ipcRenderer.invoke("settings:migrate-data", newPath),
+    migrateData: (newPath: string) =>
+      ipcRenderer.invoke("settings:migrate-data", newPath),
   },
 
   // 事件监听

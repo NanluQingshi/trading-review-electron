@@ -313,6 +313,37 @@ export const deleteTrade = (id: number) => {
   }
 };
 
+// 批量删除交易记录
+export const deleteTrades = (ids: number[]) => {
+  try {
+    if (ids.length === 0) {
+      return { success: false, message: "请选择要删除的交易记录" };
+    }
+    
+    // 获取要删除的所有交易记录的methodId
+    const methodIds = new Set<string>();
+    for (const id of ids) {
+      const trade = getQuery("SELECT methodId FROM trades WHERE id = ?", [id]);
+      if (trade?.methodId) {
+        methodIds.add(trade.methodId);
+      }
+    }
+    
+    const placeholders = ids.map(() => '?').join(',');
+    runQuery(`DELETE FROM trades WHERE id IN (${placeholders})`, ids);
+    
+    // 更新所有相关方法的统计数据
+    for (const methodId of methodIds) {
+      updateMethodStats(methodId);
+    }
+    
+    return { success: true, count: ids.length };
+  } catch (error) {
+    console.error("批量删除交易记录失败:", error);
+    return { success: false, message: (error as Error).message };
+  }
+};
+
 // 辅助函数：更新方法统计数据（使用次数和胜率）
 export const updateMethodStats = (methodId: string) => {
   if (!methodId) return;

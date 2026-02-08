@@ -57,6 +57,13 @@ export const methodsApi = {
     const result = await window.electron.methods.delete(id);
     return result;
   },
+  deleteMethods: async (ids: string[]) => {
+    if (!ensureElectronExists()) {
+      throw new Error("Electron API not ready yet, please retry");
+    }
+    const result = await window.electron.methods.deleteBatch(ids);
+    return result;
+  },
   getDefaultMethod: async () => {
     if (!ensureElectronExists()) {
       return {
@@ -120,6 +127,13 @@ export const tradesApi = {
       throw new Error("Electron API not ready yet, please retry");
     }
     const result = await window.electron.trades.delete(id);
+    return result;
+  },
+  deleteTrades: async (ids: number[]) => {
+    if (!ensureElectronExists()) {
+      throw new Error("Electron API not ready yet, please retry");
+    }
+    const result = await window.electron.trades.deleteBatch(ids);
     return result;
   },
 };
