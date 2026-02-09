@@ -1,3 +1,10 @@
+/*
+ * @Author: NanluQingshi
+ * @Date: 2026-02-09 14:19:07
+ * @LastEditors: NanluQingshi
+ * @LastEditTime: 2026-02-09 15:59:23
+ * @Description:
+ */
 /// <reference types="vite/client" />
 
 interface Window {

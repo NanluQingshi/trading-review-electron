@@ -27,7 +27,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ form, methods, initialValues }) =
   }, [form, methods, initialValues]);
 
   return (
-    <Form form={form} layout="vertical" style={{ marginTop: 24 }}>
+    <Form form={form} layout="vertical" className="trade-form">
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="symbol" label="交易品种" rules={[{ required: true }]}>

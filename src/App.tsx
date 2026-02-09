@@ -19,7 +19,6 @@ import MethodsPage from './pages/MethodsPage';
 import TradesPage from './pages/TradesPage';
 import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
-import '@styles/App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -40,37 +39,23 @@ const AppContent: React.FC = () => {
 
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-layout">
       <Sider 
         collapsible 
         collapsed={collapsed} 
         onCollapse={(value) => setCollapsed(value)}
         theme="light"
-        style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)'
-        }}
+        className="app-sider"
       >
-        <div style={{ 
-          height: 64, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '16px',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
-          <DashboardOutlined style={{ fontSize: 24, color: '#1677ff', marginRight: collapsed ? 0 : 8 }} />
-          {!collapsed && <span style={{ fontSize: 16, fontWeight: 'bold', color: '#1f1f1f' }}>TradingReview</span>}
+        <div className="sider-header">
+          <DashboardOutlined className="logo-icon" style={{ marginRight: collapsed ? 0 : 8 }} />
+          {!collapsed && <span className="logo-text">TradingReview</span>}
         </div>
         <Menu
           theme="light"
           mode="inline"
           selectedKeys={[getSelectedKey()]}
+          className="app-menu"
           items={[
             {
               key: 'methods',
@@ -95,28 +80,12 @@ const AppContent: React.FC = () => {
           ]}
         />
       </Sider>
-      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s' }}>
-        <Header style={{ 
-          position: 'fixed', 
-          width: `calc(100% - ${collapsed ? 80 : 200}px)`,
-          padding: '0 24px', 
-          background: '#fff', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'flex-end',
-          boxShadow: '0 1px 4px rgba(0,21,41,.08)',
-          zIndex: 1
-        }}>
+      <Layout className={`app-main ${collapsed ? 'collapsed' : ''}`}>
+        <Header className="app-header">
           {/* Header内容 */}
         </Header>
-        <Content style={{ margin: '80px 16px', overflow: 'initial' }}>
-          <div style={{ 
-            padding: 24, 
-            background: '#fff', 
-            borderRadius: 8,
-            minHeight: 'calc(100vh - 160px)',
-            boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03),0 1px 6px -1px rgba(0,0,0,0.02),0 2px 4px 0 rgba(0,0,0,0.02)'
-          }}>
+        <Content className="app-content">
+          <div className="content-container">
             <Routes>
               <Route path="/" element={<MethodsPage />} />
               <Route path="/trades" element={<TradesPage />} />
@@ -125,7 +94,7 @@ const AppContent: React.FC = () => {
             </Routes>
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center', color: '#8c8c8c' }}>
+        <Footer className="app-footer">
           TradingReview ©2026 Created by NanluQingshi
         </Footer>
       </Layout>

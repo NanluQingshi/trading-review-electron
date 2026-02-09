@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-01-21 13:48:04
+ * @LastEditTime: 2026-02-09 15:45:20
  * @Description:
  */
 /**
@@ -33,7 +33,6 @@
  * ```
  */
 import "@/index";
-import "@styles/index.css";
 
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',

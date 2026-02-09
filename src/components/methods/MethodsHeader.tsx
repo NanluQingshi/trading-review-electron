@@ -24,27 +24,27 @@ const MethodsHeader: React.FC<MethodsHeaderProps> = ({
   onSearchChange
 }) => {
   return (
-    <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
-      <Col flex="auto">
-        <Title level={3} style={{ margin: 0 }}>Method 库</Title>
-        <Text type="secondary">定义并管理您的交易系统，追踪每种策略的实战表现</Text>
-        {selectedCount > 0 && (
-          <Text type="secondary" style={{ marginLeft: 8 }}>
-            已选择 {selectedCount} 项
-          </Text>
-        )}
-        <div style={{ marginTop: 16, maxWidth: 400 }}>
-          <Input
-            placeholder="搜索交易方法..."
-            prefix={<SearchOutlined />}
-            value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
-            allowClear
-          />
+    <div className="methods-header">
+      <div className="header-content">
+        <div className="header-left">
+          <Title level={3} className="header-title">Method 库</Title>
+          <Text type="secondary" className="header-description">定义并管理您的交易系统，追踪每种策略的实战表现</Text>
+          {selectedCount > 0 && (
+            <Text type="secondary" className="header-selection-info">
+              已选择 {selectedCount} 项
+            </Text>
+          )}
+          <div className="search-container">
+            <Input
+              placeholder="搜索交易方法..."
+              prefix={<SearchOutlined />}
+              value={searchValue}
+              onChange={(e) => onSearchChange(e.target.value)}
+              allowClear
+            />
+          </div>
         </div>
-      </Col>
-      <Col>
-        <Space>
+        <div className="header-actions">
           {selectedCount > 0 && (
             <>
               <Button 
@@ -75,9 +75,9 @@ const MethodsHeader: React.FC<MethodsHeaderProps> = ({
           <Button type="primary" icon={<PlusOutlined />} onClick={onAddMethod} size="large">
             新增方法
           </Button>
-        </Space>
-      </Col>
-    </Row>
+        </div>
+      </div>
+    </div>
   );
 };
 

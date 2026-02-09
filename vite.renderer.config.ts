@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 22:41:36
+ * @LastEditTime: 2026-02-09 15:50:39
  * @Description:
  */
 import { defineConfig } from "vite";
@@ -14,7 +14,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@electron": path.resolve(__dirname, "./electron"),
-      "@styles": path.resolve(__dirname, "./styles"),
+      "@styles": path.resolve(__dirname, "./src/styles"),
     },
   },
   build: {

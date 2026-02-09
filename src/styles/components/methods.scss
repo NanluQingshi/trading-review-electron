@@ -1,0 +1,182 @@
+/* Methods 页面样式 */
+.methods-page {
+  padding: 24px;
+  width: 100%;
+
+  .methods-content {
+    min-height: 400px;
+    width: 100%;
+  }
+
+  .empty-state {
+    margin-top: 100px;
+  }
+
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+  }
+
+  @media (max-width: 1200px) {
+    .methods-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .methods-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .method-card-container {
+    display: flex;
+    width: 100%;
+    min-width: 300px;
+
+    .ant-card {
+      width: 100%;
+      min-width: 300px;
+    }
+  }
+}
+
+/* Methods 头部样式 */
+.methods-header {
+  margin-bottom: 32px;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .header-left {
+    flex: 1;
+  }
+
+  .header-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .header-description {
+    color: #8c8c8c;
+    margin-bottom: 16px;
+  }
+
+  .header-selection-info {
+    color: #8c8c8c;
+    margin-left: 8px;
+  }
+
+  .search-container {
+    margin-top: 16px;
+    max-width: 400px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+/* Method Card 样式 */
+.method-card {
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .card-code {
+    font-size: 12px;
+    color: #8c8c8c;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .card-content {
+    margin-top: 16px;
+  }
+
+  .card-description {
+    margin-bottom: 16px;
+    color: #595959;
+    line-height: 1.5;
+  }
+
+  .card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+/* Method Modal 样式 */
+.method-modal {
+  .modal-content {
+    width: 100%;
+  }
+
+  .form-item {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    font-weight: 500;
+  }
+
+  .form-input {
+    width: 100%;
+  }
+
+  .form-textarea {
+    width: 100%;
+    min-height: 120px;
+  }
+}

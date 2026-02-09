@@ -135,11 +135,11 @@ const MethodsPage: React.FC = () => {
       />
 
       <Spin spinning={loading} tip="加载方法库中...">
-        <div style={{ minHeight: '400px' }}>
+        <div className="methods-content">
           {filteredMethods.length === 0 && !loading ? (
             <Empty 
               description={searchValue ? "没有找到匹配的交易方法" : "暂无交易方法，点击右上角新增"} 
-              style={{ marginTop: 100 }} 
+              className="empty-state"
             />
           ) : (
             <Row gutter={[24, 24]}>

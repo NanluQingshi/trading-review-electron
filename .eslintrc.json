@@ -19,9 +19,9 @@
         "map": [
           ["@", "./src"],
           ["@electron", "./electron"],
-          ["@styles", "./styles"]
+          ["@styles", "./src/styles"]
         ],
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json", ".scss"]
       },
       "typescript": {
         "alwaysTryTypes": true,
