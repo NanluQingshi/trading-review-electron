@@ -1,6 +1,6 @@
 import React from 'react';
-import { Row, Col, Typography, Button, Space, Popconfirm } from 'antd';
-import { PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Space, Popconfirm, Input } from 'antd';
+import { PlusOutlined, DeleteOutlined, CheckOutlined, SearchOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -10,6 +10,8 @@ interface MethodsHeaderProps {
   onSelectAll: () => void;
   onDeselectAll: () => void;
   onBatchDelete: () => void;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
 }
 
 const MethodsHeader: React.FC<MethodsHeaderProps> = ({ 
@@ -17,11 +19,13 @@ const MethodsHeader: React.FC<MethodsHeaderProps> = ({
   selectedCount, 
   onSelectAll, 
   onDeselectAll, 
-  onBatchDelete 
+  onBatchDelete,
+  searchValue,
+  onSearchChange
 }) => {
   return (
     <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
-      <Col>
+      <Col flex="auto">
         <Title level={3} style={{ margin: 0 }}>Method 库</Title>
         <Text type="secondary">定义并管理您的交易系统，追踪每种策略的实战表现</Text>
         {selectedCount > 0 && (
@@ -29,6 +33,15 @@ const MethodsHeader: React.FC<MethodsHeaderProps> = ({
             已选择 {selectedCount} 项
           </Text>
         )}
+        <div style={{ marginTop: 16, maxWidth: 400 }}>
+          <Input
+            placeholder="搜索交易方法..."
+            prefix={<SearchOutlined />}
+            value={searchValue}
+            onChange={(e) => onSearchChange(e.target.value)}
+            allowClear
+          />
+        </div>
       </Col>
       <Col>
         <Space>

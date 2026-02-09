@@ -26,6 +26,25 @@ const MethodsPage: React.FC = () => {
   // 批量选择状态
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBatchDeleteModal, setShowBatchDeleteModal] = useState(false);
+  
+  // 搜索状态
+  const [searchValue, setSearchValue] = useState('');
+  
+  // 处理搜索变化
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+  };
+  
+  // 过滤方法
+  const filteredMethods = methods.filter(method => {
+    if (!searchValue) return true;
+    const searchLower = searchValue.toLowerCase();
+    return (
+      method.name.toLowerCase().includes(searchLower) ||
+      method.code.toLowerCase().includes(searchLower) ||
+      (method.description && method.description.toLowerCase().includes(searchLower))
+    );
+  });
 
   // 打开新增方法模态框
   const handleAddMethod = () => {
@@ -79,7 +98,7 @@ const MethodsPage: React.FC = () => {
   // 全选/取消全选
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(methods.map(method => method.id));
+      setSelectedIds(filteredMethods.map(method => method.id));
     } else {
       setSelectedIds([]);
     }
@@ -111,15 +130,20 @@ const MethodsPage: React.FC = () => {
         onSelectAll={() => handleSelectAll(true)}
         onDeselectAll={() => handleSelectAll(false)}
         onBatchDelete={() => setShowBatchDeleteModal(true)}
+        searchValue={searchValue}
+        onSearchChange={handleSearchChange}
       />
 
       <Spin spinning={loading} tip="加载方法库中...">
         <div style={{ minHeight: '400px' }}>
-          {methods.length === 0 && !loading ? (
-            <Empty description="暂无交易方法，点击右上角新增" style={{ marginTop: 100 }} />
+          {filteredMethods.length === 0 && !loading ? (
+            <Empty 
+              description={searchValue ? "没有找到匹配的交易方法" : "暂无交易方法，点击右上角新增"} 
+              style={{ marginTop: 100 }} 
+            />
           ) : (
             <Row gutter={[24, 24]}>
-              {methods.map((method) => (
+              {filteredMethods.map((method) => (
                 <Col xs={24} sm={12} lg={8} key={method.id}>
                   <Methods.MethodCard 
                     method={method} 
