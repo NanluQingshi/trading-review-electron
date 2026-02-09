@@ -148,7 +148,7 @@ const SettingsPage: React.FC = () => {
       </Card>
 
       <Card title="关于" style={{ marginBottom: 24 }}>
-        <Space direction="vertical" size="small">
+        <Space orientation="vertical" size="small">
           <Text>应用名称：TradingReview</Text>
           <Text>版本：1.0.0</Text>
           <Text>开发者：NanluQingshi</Text>
