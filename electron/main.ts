@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-07 15:40:36
+ * @LastEditTime: 2026-02-25 23:00:41
  * @Description:
  */
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
@@ -21,7 +21,7 @@ if (started) {
 }
 
 // 硬编码的过期日期配置
-const EXPIRE_DATE = new Date("2026-02-14T00:00:00");
+const EXPIRE_DATE = new Date("2026-03-15T00:00:00");
 
 // 定期检查间隔（12小时）
 const CHECK_INTERVAL = 12 * 60 * 60 * 1000;
@@ -227,10 +227,10 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   // 检查应用是否过期
-  // if (!checkAppExpiration()) {
-  //   showExpirationDialog();
-  //   return;
-  // }
+  if (!checkAppExpiration()) {
+    showExpirationDialog();
+    return;
+  }
 
   // 初始化应用
   initializeApp();
@@ -242,7 +242,7 @@ app.on("ready", () => {
   createWindow();
 
   // 启动定期过期检查
-  // startPeriodicExpirationCheck();
+  startPeriodicExpirationCheck();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
