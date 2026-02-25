@@ -227,10 +227,10 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   // 检查应用是否过期
-  if (!checkAppExpiration()) {
-    showExpirationDialog();
-    return;
-  }
+  // if (!checkAppExpiration()) {
+  //   showExpirationDialog();
+  //   return;
+  // }
 
   // 初始化应用
   initializeApp();
@@ -242,7 +242,7 @@ app.on("ready", () => {
   createWindow();
 
   // 启动定期过期检查
-  startPeriodicExpirationCheck();
+  // startPeriodicExpirationCheck();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
