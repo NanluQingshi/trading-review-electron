@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-01-21 12:17:02
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-25 23:00:41
+ * @LastEditTime: 2026-02-25 23:07:08
  * @Description:
  */
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
