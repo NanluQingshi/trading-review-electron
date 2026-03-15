@@ -3,7 +3,7 @@
  * @Description: 激活页面 - 首次使用需联网验证激活码，激活后可离线使用
  */
 import React, { useState } from 'react';
-import { Card, Form, Input, Button, message, Typography, Space } from 'antd';
+import { Card, Form, Input, Button, message, Typography, Space, Spin } from 'antd';
 import { SafetyCertificateOutlined, KeyOutlined } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
@@ -57,6 +57,7 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
           borderRadius: 12,
         }}
       >
+        <Spin spinning={loading} tip="验证中，请稍候...">
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div style={{ textAlign: 'center' }}>
             <SafetyCertificateOutlined
@@ -87,6 +88,7 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
                 placeholder="请输入激活码"
                 size="large"
                 autoComplete="off"
+                disabled={loading}
               />
             </Form.Item>
 
@@ -108,6 +110,7 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
             nanluqingshi@gmail.com
           </Text>
         </Space>
+        </Spin>
       </Card>
     </div>
   );
