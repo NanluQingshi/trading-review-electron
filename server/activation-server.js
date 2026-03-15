@@ -4,8 +4,7 @@
  * 默认端口: 3001
  *
  * 数据库文件: server/data/activation.db
- * 使用前请在 .env 中设置:
- * ACTIVATION_SERVER_URL=http://localhost:3001/api/activate
+ * App 端 .env 配置 base URL: ACTIVATION_SERVER_URL=http://localhost:3001
  */
 const path = require('path');
 const express = require('express');
@@ -62,8 +61,13 @@ const db = initDatabase();
 
 app.post('/api/activate', (req, res) => {
   const { code } = req.body;
+  const time = new Date().toLocaleString('zh-CN');
+  const proto = req.get('x-forwarded-proto') || req.protocol || 'http';
+  const host = req.get('x-forwarded-host') || req.get('host') || `localhost:${process.env.PORT || 3001}`;
+  const url = `${proto}://${host}${req.originalUrl || '/api/activate'}`;
 
   if (!code || typeof code !== 'string') {
+    console.log(`[${time}] 激活请求 - URL: ${url} - 无效: 未提供激活码`);
     return res.status(400).json({
       success: false,
       message: '请提供有效的激活码',
@@ -71,6 +75,7 @@ app.post('/api/activate', (req, res) => {
   }
 
   const trimmedCode = code.trim();
+  console.log(`[${time}] 激活请求 - URL: ${url} - 激活码: ${trimmedCode}`);
 
   try {
     const row = db
@@ -78,6 +83,7 @@ app.post('/api/activate', (req, res) => {
       .get(trimmedCode);
 
     if (!row) {
+      console.log(`[${time}] 激活失败 - 激活码无效: ${trimmedCode}`);
       return res.status(400).json({
         success: false,
         message: '激活码无效',
@@ -85,6 +91,7 @@ app.post('/api/activate', (req, res) => {
     }
 
     if (row.used === 1) {
+      console.log(`[${time}] 激活失败 - 已被使用: ${trimmedCode}`);
       return res.status(400).json({
         success: false,
         message: '该激活码已被使用',
@@ -95,12 +102,13 @@ app.post('/api/activate', (req, res) => {
       "UPDATE activation_codes SET used = 1, used_at = datetime('now') WHERE code = ?",
     ).run(trimmedCode);
 
+    console.log(`[${time}] 激活成功 ✓ ${trimmedCode}`);
     return res.json({
       success: true,
       message: '激活成功',
     });
   } catch (err) {
-    console.error('激活验证异常:', err);
+    console.error(`[${time}] 激活验证异常:`, err);
     return res.status(500).json({
       success: false,
       message: '服务器内部错误',

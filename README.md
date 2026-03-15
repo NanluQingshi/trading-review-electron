@@ -237,7 +237,11 @@ npm run package
 
 ### 激活服务器
 
-如需自建激活服务，请参考 [server/docs/激活服务器配置说明.md](server/docs/激活服务器配置说明.md) 和 [server/docs/云服务器部署指南.md](server/docs/云服务器部署指南.md)。
+如需自建激活服务，请参考：
+
+- [激活服务器配置说明](server/docs/激活服务器配置说明.md) - 接口规范与配置
+- [本地 cpolar 激活指南](server/docs/本地cpolar激活指南.md) - 用本机 + cpolar 快速搭建（推荐小规模使用，国内网络更稳定）
+- [云服务器部署指南](server/docs/云服务器部署指南.md) - 部署到阿里云/腾讯云等
 
 ---
 

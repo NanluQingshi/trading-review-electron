@@ -2,7 +2,7 @@
  * @Author: NanluQingshi
  * @Date: 2026-03-14 19:24:08
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-03-14 19:26:30
+ * @LastEditTime: 2026-03-15 22:20:58
  * @Description: 
  */
 /*
@@ -16,13 +16,19 @@ import {
   getActivationServerUrl as getConfigServerUrl,
 } from "@electron/config";
 
-// 激活服务器 URL，优先级：环境变量 > config.json > 默认值
+// 激活接口路径，写在代码中
+const ACTIVATION_API_PATH = "/api/activate";
+
+// 激活服务器 base URL，优先级：环境变量 > config.json > 默认值（不含接口路径）
 const getActivationServerUrl = (): string => {
-  return (
+  const base =
     process.env.ACTIVATION_SERVER_URL ||
     getConfigServerUrl() ||
-    "https://your-activation-server.com/api/activate"
-  );
+    "https://your-activation-server.com";
+  // 若已包含完整路径则直接用，否则拼接（兼容旧配置）
+  return base.endsWith(ACTIVATION_API_PATH)
+    ? base
+    : base.replace(/\/$/, "") + ACTIVATION_API_PATH;
 };
 
 export const isActivated = (): boolean => {
@@ -42,11 +48,12 @@ export const verifyActivationCode = async (code: string): Promise<VerifyResult> 
 
   try {
     const serverUrl = getActivationServerUrl();
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
     const response = await fetch(serverUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         code: trimmedCode,
         appVersion: app.getVersion(),
