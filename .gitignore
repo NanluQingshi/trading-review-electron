@@ -13,10 +13,12 @@ dist/
 out/
 .vite/
 
-# Environment variables
-# .env
-# .env.local
-# .env.*.local
+# Environment variables (含激活服务器地址等敏感配置，切勿提交)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
 
 # IDE
 .vscode/
@@ -46,3 +48,9 @@ tmp/
 .DS_Store
 Thumbs.db
 data/
+
+# 敏感文件（密钥、证书、用户数据等）
+*.pem
+*.key
+*.p12
+*.pfx
