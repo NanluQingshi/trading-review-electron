@@ -39,6 +39,12 @@ interface ElectronAPI {
     profitCurve: () => Promise<any>;
   };
 
+  // 激活相关
+  activation: {
+    getStatus: () => Promise<boolean>;
+    verify: (code: string) => Promise<{ success: boolean; message: string }>;
+  };
+
   // 设置相关
   settings: {
     getDataPath: () => Promise<string | null>;
@@ -94,6 +100,12 @@ contextBridge.exposeInMainWorld("electron", {
     timePeriod: (period: "day" | "week" | "month") =>
       ipcRenderer.invoke("stats:time-period", period),
     profitCurve: () => ipcRenderer.invoke("stats:profit-curve"),
+  },
+
+  // 激活相关
+  activation: {
+    getStatus: () => ipcRenderer.invoke("activation:getStatus"),
+    verify: (code: string) => ipcRenderer.invoke("activation:verify", code),
   },
 
   // 设置相关

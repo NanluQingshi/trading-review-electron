@@ -62,3 +62,22 @@ export const clearDataPath = () => {
   delete config.dataPath;
   return setConfig(config);
 };
+
+// 激活相关配置
+export const getActivationStatus = (): boolean => {
+  const config = getConfig();
+  return config.activated === true;
+};
+
+export const setActivation = (code: string) => {
+  const config = getConfig();
+  config.activated = true;
+  config.activatedAt = new Date().toISOString();
+  config.activationCode = code; // 仅用于记录，不用于验证
+  return setConfig(config);
+};
+
+export const getActivationServerUrl = (): string | null => {
+  const config = getConfig();
+  return config.activationServerUrl || null;
+};

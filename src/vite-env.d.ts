@@ -30,6 +30,10 @@ interface Window {
       timePeriod: (period: "day" | "week" | "month") => Promise<any>;
       profitCurve: () => Promise<any>;
     };
+    activation: {
+      getStatus: () => Promise<boolean>;
+      verify: (code: string) => Promise<{ success: boolean; message: string }>;
+    };
     settings: {
       getDataPath: () => Promise<string | null>;
       setDataPath: (dataPath: string) => Promise<boolean>;

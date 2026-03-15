@@ -5,6 +5,7 @@
  * @LastEditTime: 2026-02-25 23:07:08
  * @Description:
  */
+import "dotenv/config";
 import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import path from "node:path";
 import fs from "node:fs";
@@ -14,64 +15,12 @@ import * as tradeHandlers from "@electron/handlers/tradeHandlers";
 import * as methodHandlers from "@electron/handlers/methodHandlers";
 import * as statsHandlers from "@electron/handlers/statsHandlers";
 import { getDataPath, setDataPath, clearDataPath } from "@electron/config";
+import * as activationHandler from "@electron/handlers/activationHandler";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
-
-// 硬编码的过期日期配置
-const EXPIRE_DATE = new Date("2026-03-15T00:00:00");
-
-// 定期检查间隔（12小时）
-const CHECK_INTERVAL = 12 * 60 * 60 * 1000;
-
-// 检查应用是否过期
-const checkAppExpiration = () => {
-  const now = new Date();
-
-  if (now >= EXPIRE_DATE) {
-    return false;
-  }
-  return true;
-};
-
-// 显示过期提示并退出应用
-const showExpirationDialog = () => {
-  dialog.showMessageBoxSync({
-    type: "error",
-    title: "应用已过期",
-    message: "试用版本已过期",
-    detail:
-      "感谢您试用本应用。您的试用版本已过期，请联系开发者获取正式版本。\n\n联系方式：\n邮箱：nanluqingshi@gmail.com",
-    buttons: ["退出"],
-    defaultId: 0,
-  });
-
-  app.quit();
-};
-
-// 定期检查应用是否过期
-let expirationCheckTimer: NodeJS.Timeout | null = null;
-
-const startPeriodicExpirationCheck = () => {
-  if (expirationCheckTimer) {
-    clearInterval(expirationCheckTimer);
-  }
-
-  expirationCheckTimer = setInterval(() => {
-    if (!checkAppExpiration()) {
-      showExpirationDialog();
-    }
-  }, CHECK_INTERVAL);
-};
-
-const stopPeriodicExpirationCheck = () => {
-  if (expirationCheckTimer) {
-    clearInterval(expirationCheckTimer);
-    expirationCheckTimer = null;
-  }
-};
 
 // 初始化应用
 const initializeApp = () => {
@@ -153,6 +102,12 @@ const registerIpcHandlers = () => {
     }
     return null;
   });
+  // 激活相关 IPC
+  ipcMain.handle("activation:getStatus", () => activationHandler.isActivated());
+  ipcMain.handle("activation:verify", (_, code: string) =>
+    activationHandler.verifyActivationCode(code),
+  );
+
   ipcMain.handle("settings:migrate-data", async (_, newPath) => {
     try {
       const oldPath = app.getPath("userData");
@@ -226,37 +181,23 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
-  // 检查应用是否过期
-  if (!checkAppExpiration()) {
-    showExpirationDialog();
-    return;
-  }
-
   // 初始化应用
   initializeApp();
 
   // 注册IPC处理函数
   registerIpcHandlers();
 
-  // 创建应用窗口
+  // 创建应用窗口（激活检查在渲染进程中进行）
   createWindow();
-
-  // 启动定期过期检查
-  startPeriodicExpirationCheck();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  stopPeriodicExpirationCheck();
   if (process.platform !== "darwin") {
     app.quit();
   }
-});
-
-app.on("before-quit", () => {
-  stopPeriodicExpirationCheck();
 });
 
 app.on("activate", () => {

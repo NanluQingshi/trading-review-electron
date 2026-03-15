@@ -5,9 +5,9 @@
  * @版权声明：© 2026 南路情诗 保留所有权利
  * @使用条款：未经授权，不得复制、修改、分发或用于商业目的
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layout, Menu, ConfigProvider } from 'antd';
+import { Layout, Menu, ConfigProvider, Spin } from 'antd';
 import { 
   BookOutlined, 
   LineChartOutlined, 
@@ -19,6 +19,7 @@ import MethodsPage from './pages/MethodsPage';
 import TradesPage from './pages/TradesPage';
 import StatsPage from './pages/StatsPage';
 import SettingsPage from './pages/SettingsPage';
+import ActivationPage from './pages/ActivationPage';
 import '@styles/App.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -134,6 +135,50 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [activated, setActivated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    window.electron.activation.getStatus().then(setActivated);
+  }, []);
+
+  const handleActivated = () => {
+    setActivated(true);
+  };
+
+  // 加载中
+  if (activated === null) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#f5f5f5',
+        }}
+      >
+        <Spin size="large" tip="加载中..." />
+      </div>
+    );
+  }
+
+  // 未激活，显示激活页面
+  if (!activated) {
+    return (
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#1677ff',
+            borderRadius: 6,
+          },
+        }}
+      >
+        <ActivationPage onActivated={handleActivated} />
+      </ConfigProvider>
+    );
+  }
+
+  // 已激活，显示主应用
   return (
     <ConfigProvider
       theme={{
