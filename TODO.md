@@ -16,9 +16,9 @@
 ## 二、中优先级（功能补全）
 
 - [ ] **2.1 截图功能未实现** - `trades` 表有 `screenshot` 字段，但无上传、预览、展示逻辑。在 TradeForm / TradeModal 中实现截图上传、存储与展示。
-- [ ] **2.2 交易筛选缺少日期范围** - 后端支持 `startDate` / `endDate`，前端 `TradesFilter` 无日期选择。增加日期范围选择器并传给 `fetchTrades`。
-- [ ] **2.3 设置页版本号硬编码** - `src/pages/SettingsPage.tsx`。修复：改为 `window.electron.getAppVersion()`。
-- [ ] **2.4 cleanupDirtyMethods 未实现** - `electron/handlers/methodHandlers.ts`。实现脏数据清理逻辑，或移除相关调用。
+- [x] **2.2 交易筛选缺少日期范围** - 后端支持 `startDate` / `endDate`，前端 `TradesFilter` 已增加日期范围选择器并传给 `fetchTrades`。
+- [x] **2.3 设置页版本号硬编码** - `src/pages/SettingsPage.tsx` 已改为通过 `window.electron.getAppVersion()` 动态获取。
+- [x] **2.4 cleanupDirtyMethods 未实现** - `electron/handlers/methodHandlers.ts` 已实现重新计算所有方法的 `usage_count` / `win_rate` / `total_pnl` 的清理逻辑。
 
 ---
 

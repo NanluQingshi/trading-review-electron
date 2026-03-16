@@ -10,9 +10,11 @@ const SettingsPage: React.FC = () => {
   const [showRestartModal, setShowRestartModal] = useState(false);
   const [showMigrateModal, setShowMigrateModal] = useState(false);
   const [pendingPath, setPendingPath] = useState<string>('');
+  const [appVersion, setAppVersion] = useState<string>('');
 
   useEffect(() => {
     loadDataPath();
+    loadAppVersion();
   }, []);
 
   const loadDataPath = async () => {
@@ -22,6 +24,16 @@ const SettingsPage: React.FC = () => {
     } catch (error) {
       console.error('加载数据路径失败:', error);
       message.error('加载数据路径失败');
+    }
+  };
+
+  const loadAppVersion = async () => {
+    try {
+      if (!window.electron?.getAppVersion) return;
+      const version = await window.electron.getAppVersion();
+      setAppVersion(version);
+    } catch (error) {
+      console.error('加载应用版本失败:', error);
     }
   };
 
@@ -150,7 +162,7 @@ const SettingsPage: React.FC = () => {
       <Card title="关于" style={{ marginBottom: 24 }}>
         <Space orientation="vertical" size="small">
           <Text>应用名称：TradingReview</Text>
-          <Text>版本：1.0.0</Text>
+          <Text>版本：{appVersion || '加载中...'}</Text>
           <Text>开发者：NanluQingshi</Text>
           <Text>邮箱：nanluqingshi@gmail.com</Text>
         </Space>

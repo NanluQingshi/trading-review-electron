@@ -191,7 +191,38 @@ export const setDefaultMethod = (id: string) => {
 // 清理脏数据
 export const cleanupDirtyMethods = () => {
   try {
-    // TODO: 这里可以添加清理脏数据的逻辑
+    // 1. 移除 methods 表中没有任何交易引用的方法统计脏数据（可选）
+    // 实际上，这里更安全的做法是：重新根据 trades 表计算所有方法的 usage_count / win_rate / total_pnl。
+    const methods = allQuery("SELECT id FROM methods") as { id: string }[];
+    for (const m of methods) {
+      const stats = getQuery(
+        `
+        SELECT
+          COUNT(*) AS usage_count,
+          SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) AS win_trades,
+          SUM(COALESCE(profit, 0)) AS total_pnl
+        FROM trades
+        WHERE methodId = ?
+        `,
+        [m.id],
+      ) as {
+        usage_count: number;
+        win_trades: number;
+        total_pnl: number;
+      } | null;
+
+      const usageCount = stats?.usage_count || 0;
+      const totalPnl = stats?.total_pnl || 0;
+      const winTrades = stats?.win_trades || 0;
+      const winRate =
+        usageCount > 0 ? Number(((winTrades / usageCount) * 100).toFixed(2)) : 0;
+
+      runQuery(
+        "UPDATE methods SET usage_count = ?, win_rate = ?, total_pnl = ? WHERE id = ?",
+        [usageCount, winRate, totalPnl, m.id],
+      );
+    }
+
     return { success: true };
   } catch (error) {
     console.error("清理脏数据失败:", error);

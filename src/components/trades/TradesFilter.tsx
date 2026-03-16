@@ -2,25 +2,33 @@
  * @Author: NanluQingshi
  * @Date: 2026-02-05 21:57:01
  * @LastEditors: NanluQingshi
- * @LastEditTime: 2026-02-06 21:20:43
+ * @LastEditTime: 2026-03-16 00:00:00
  * @Description: 
  */
 import React from 'react';
-import { Card, Form, Input, Select, Button, Space } from 'antd';
+import { Card, Form, Input, Select, Button, Space, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { Method } from '@/types';
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 interface FilterValues {
   symbol?: string;
   methodId?: string;
   result?: 'win' | 'loss' | 'breakeven';
+  dateRange?: [moment.Moment, moment.Moment]; // 实际仅在表单内部使用，提交时转换为 startDate/endDate
 }
 
 interface TradesFilterProps {
   methods: Method[];
-  onFilter: (values: FilterValues) => void;
+  onFilter: (values: {
+    symbol?: string;
+    methodId?: string;
+    result?: 'win' | 'loss' | 'breakeven';
+    startDate?: string;
+    endDate?: string;
+  }) => void;
 }
 
 const TradesFilter: React.FC<TradesFilterProps> = ({ methods, onFilter }) => {
@@ -32,7 +40,23 @@ const TradesFilter: React.FC<TradesFilterProps> = ({ methods, onFilter }) => {
   };
 
   const handleFinish = (values: FilterValues) => {
-    onFilter(values);
+    const { symbol, methodId, result, dateRange } = values;
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+
+    if (dateRange && dateRange.length === 2) {
+      // 转为字符串，后端直接按字符串比较 entryTime
+      startDate = dateRange[0].startOf('day').toISOString();
+      endDate = dateRange[1].endOf('day').toISOString();
+    }
+
+    onFilter({
+      symbol,
+      methodId,
+      result,
+      startDate,
+      endDate,
+    });
   };
 
   return (
@@ -59,6 +83,13 @@ const TradesFilter: React.FC<TradesFilterProps> = ({ methods, onFilter }) => {
             <Option value="loss">亏损</Option>
             <Option value="breakeven">保本</Option>
           </Select>
+        </Form.Item>
+        <Form.Item name="dateRange">
+          <RangePicker
+            allowClear
+            style={{ width: 260 }}
+            placeholder={['开始日期', '结束日期']}
+          />
         </Form.Item>
         <Form.Item>
           <Space>
