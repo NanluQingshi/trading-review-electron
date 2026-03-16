@@ -2,7 +2,7 @@
  * @Author: 南路情诗
  * @Description: 激活页面 - 首次使用需联网验证激活码，激活后可离线使用
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, message, Typography, Space, Spin } from 'antd';
 import { SafetyCertificateOutlined, KeyOutlined } from '@ant-design/icons';
 
@@ -15,7 +15,20 @@ interface ActivationPageProps {
 const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
   const [loading, setLoading] = useState(false);
   const [networkError, setNetworkError] = useState(false);
+  const [trialInfo, setTrialInfo] = useState<{ enabled: boolean; daysLeft: number; totalDays: number } | null>(null);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    const loadTrialInfo = async () => {
+      try {
+        const info = await window.electron.activation.getTrialInfo();
+        setTrialInfo(info);
+      } catch (error) {
+        console.error('加载试用信息失败:', error);
+      }
+    };
+    loadTrialInfo();
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -40,6 +53,41 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
       }
       message.error('激活失败，请重试');
       setNetworkError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartTrial = async () => {
+    try {
+      setLoading(true);
+      const result = await window.electron.activation.startTrial();
+      if (!result.success || !result.enabled) {
+        message.error('试用已结束或不可用，请使用激活码激活。');
+        setTrialInfo({
+          enabled: false,
+          daysLeft: 0,
+          totalDays: trialInfo?.totalDays || 3,
+        });
+        return;
+      }
+
+      // 再次向主进程确认当前是否处于试用可用状态，防止被多次点击刷试用
+      const status = await window.electron.activation.getStatus();
+      if (status) {
+        message.success('试用已开启，当前为试用模式。');
+        onActivated();
+      } else {
+        message.error('试用已结束或不可用，请使用激活码激活。');
+        setTrialInfo({
+          enabled: false,
+          daysLeft: 0,
+          totalDays: trialInfo?.totalDays || 3,
+        });
+      }
+    } catch (error) {
+      console.error('开始试用失败:', error);
+      message.error('开始试用失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -76,6 +124,11 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
               请输入您的激活码完成激活。激活成功后即可离线使用本应用。
             </Paragraph>
+            {trialInfo && trialInfo.enabled && (
+              <Paragraph type="secondary" style={{ marginTop: 8 }}>
+                当前未激活，可先试用 {trialInfo.totalDays} 天（剩余 {trialInfo.daysLeft} 天）。
+              </Paragraph>
+            )}
           </div>
 
           <Form
@@ -119,6 +172,17 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
                     onClick={handleSubmit}
                   >
                     网络恢复后，点击此处重试激活
+                  </Button>
+                )}
+                {trialInfo && trialInfo.enabled && (
+                  <Button
+                    size="large"
+                    type="default"
+                    block
+                    disabled={loading}
+                    onClick={handleStartTrial}
+                  >
+                    先试用 {trialInfo.daysLeft} 天
                   </Button>
                 )}
               </Space>

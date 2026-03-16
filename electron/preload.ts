@@ -43,6 +43,9 @@ interface ElectronAPI {
   activation: {
     getStatus: () => Promise<boolean>;
     verify: (code: string) => Promise<{ success: boolean; message: string }>;
+    getTrialInfo: () => Promise<{ enabled: boolean; daysLeft: number; totalDays: number }>;
+    startTrial: () => Promise<{ success: boolean; enabled: boolean; daysLeft: number; totalDays: number }>;
+    getTrialCountdown: () => Promise<{ enabled: boolean; msLeft: number; totalMs: number }>;
   };
 
   // 设置相关
@@ -106,6 +109,9 @@ contextBridge.exposeInMainWorld("electron", {
   activation: {
     getStatus: () => ipcRenderer.invoke("activation:getStatus"),
     verify: (code: string) => ipcRenderer.invoke("activation:verify", code),
+    getTrialInfo: () => ipcRenderer.invoke("activation:getTrialInfo"),
+    startTrial: () => ipcRenderer.invoke("activation:startTrial"),
+    getTrialCountdown: () => ipcRenderer.invoke("activation:getTrialCountdown"),
   },
 
   // 设置相关

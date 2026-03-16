@@ -7,7 +7,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layout, Menu, ConfigProvider, Spin, Alert } from 'antd';
+import { Layout, Menu, ConfigProvider, Spin, Alert, Modal } from 'antd';
 import { 
   BookOutlined, 
   LineChartOutlined, 
@@ -152,6 +152,85 @@ const App: React.FC = () => {
     };
     checkActivation();
   }, []);
+
+  // 试用期倒计时逻辑：
+  // - 试用开始后总时长 3 天（在 electron/config.ts 中配置）
+  // - 试用结束前 30 分钟弹出提醒
+  // - 试用时间到后强制返回激活页
+  useEffect(() => {
+    if (!activated) {
+      return;
+    }
+
+    let reminderTimer: ReturnType<typeof setTimeout> | null = null;
+    let expireTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const setupTrialCountdown = async () => {
+      try {
+        const countdown = await window.electron.activation.getTrialCountdown();
+        if (!countdown || !countdown.enabled) {
+          return;
+        }
+
+        const { msLeft } = countdown;
+
+        if (msLeft <= 0) {
+          Modal.info({
+            title: '试用已结束',
+            content: '试用期已结束，将返回激活页面。',
+            onOk: () => {
+              setActivated(false);
+            },
+          });
+          setActivated(false);
+          return;
+        }
+
+        const reminderMs = msLeft - 30 * 60 * 1000;
+
+        if (reminderMs > 0) {
+          reminderTimer = setTimeout(() => {
+            Modal.warning({
+              title: '试用即将结束',
+              content:
+                '当前为试用模式，试用将在 30 分钟后结束，请及时保存数据并准备回到激活页面。',
+            });
+          }, reminderMs);
+        } else {
+          // 若打开应用时已处于试用最后 30 分钟内，则立即提示
+          Modal.warning({
+            title: '试用即将结束',
+            content:
+              '当前为试用模式，试用即将结束，请及时保存数据并准备回到激活页面。',
+          });
+        }
+
+        expireTimer = setTimeout(() => {
+          Modal.info({
+            title: '试用已结束',
+            content: '试用期已结束，将返回激活页面。',
+            onOk: () => {
+              setActivated(false);
+            },
+          });
+          setActivated(false);
+        }, msLeft);
+      } catch (error) {
+        console.error('试用倒计时初始化失败:', error);
+      }
+    };
+
+    setupTrialCountdown();
+
+    return () => {
+      if (reminderTimer) {
+        clearTimeout(reminderTimer);
+      }
+      if (expireTimer) {
+        clearTimeout(expireTimer);
+      }
+    };
+  }, [activated]);
 
   // 监听在线/离线状态，给出全局提示
   useEffect(() => {

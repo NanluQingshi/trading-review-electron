@@ -107,6 +107,15 @@ const registerIpcHandlers = () => {
   ipcMain.handle("activation:verify", (_, code: string) =>
     activationHandler.verifyActivationCode(code),
   );
+  ipcMain.handle("activation:getTrialInfo", () =>
+    activationHandler.getTrialInfo(),
+  );
+  ipcMain.handle("activation:startTrial", () =>
+    activationHandler.startTrial(),
+  );
+  ipcMain.handle("activation:getTrialCountdown", () =>
+    activationHandler.getTrialCountdown(),
+  );
 
   ipcMain.handle("settings:migrate-data", async (_, newPath) => {
     try {

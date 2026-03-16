@@ -33,6 +33,9 @@ interface Window {
     activation: {
       getStatus: () => Promise<boolean>;
       verify: (code: string) => Promise<{ success: boolean; message: string }>;
+      getTrialInfo: () => Promise<{ enabled: boolean; daysLeft: number; totalDays: number }>;
+      startTrial: () => Promise<{ success: boolean; enabled: boolean; daysLeft: number; totalDays: number }>;
+      getTrialCountdown: () => Promise<{ enabled: boolean; msLeft: number; totalMs: number }>;
     };
     settings: {
       getDataPath: () => Promise<string | null>;

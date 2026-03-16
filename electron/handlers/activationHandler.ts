@@ -14,6 +14,9 @@ import {
   getActivationStatus,
   setActivation,
   getActivationServerUrl as getConfigServerUrl,
+  getTrialInfo as getConfigTrialInfo,
+  startTrial as startConfigTrial,
+  getTrialCountdown as getConfigTrialCountdown,
 } from "@electron/config";
 
 // 激活接口路径，写在代码中
@@ -33,6 +36,18 @@ const getActivationServerUrl = (): string => {
 
 export const isActivated = (): boolean => {
   return getActivationStatus();
+};
+
+export const getTrialInfo = () => {
+  return getConfigTrialInfo();
+};
+
+export const startTrial = () => {
+  return startConfigTrial();
+};
+
+export const getTrialCountdown = () => {
+  return getConfigTrialCountdown();
 };
 
 export interface VerifyResult {
