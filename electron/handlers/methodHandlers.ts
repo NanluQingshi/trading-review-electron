@@ -58,6 +58,12 @@ export interface Method {
 // 创建新策略方法
 export const createMethod = (method: Method) => {
   try {
+    if (!method.code || !method.name) {
+      return {
+        success: false,
+        message: "方法代码和名称为必填项",
+      };
+    }
     const id =
       method.id ||
       `method_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
@@ -95,6 +101,12 @@ export const getAllMethods = () => {
 // 更新策略方法
 export const updateMethod = (id: string, method: Method) => {
   try {
+    if (!method.code || !method.name) {
+      return {
+        success: false,
+        message: "方法代码和名称为必填项",
+      };
+    }
     runQuery(
       "UPDATE methods SET code = ?, name = ?, description = ?, is_default = ?, usage_count = ?, win_rate = ?, total_pnl = ? WHERE id = ?",
       [

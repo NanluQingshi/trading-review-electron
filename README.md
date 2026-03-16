@@ -254,6 +254,67 @@ npm run package
 
 ---
 
+## 🔌 IPC 通信说明（简要）
+
+主进程通过 `ipcMain.handle` 暴露以下通道，预加载脚本 `preload.ts` 通过 `window.electron` 封装为前端可调用的 API：
+
+- `app:version` → `window.electron.getAppVersion()`
+- 交易：
+  - `trades:list` → `window.electron.trades.list(filters?)`
+  - `trades:detail` → `window.electron.trades.detail(id)`
+  - `trades:create` → `window.electron.trades.create(trade)`
+  - `trades:update` → `window.electron.trades.update(id, trade)`
+  - `trades:delete` → `window.electron.trades.delete(id)`
+  - `trades:delete-batch` → `window.electron.trades.deleteBatch(ids)`
+- 方法：
+  - `methods:list` / `methods:detail` / `methods:create` / `methods:update` / `methods:delete` / `methods:delete-batch`
+  - `methods:default` / `methods:set-default`
+- 统计：
+  - `stats:overall` / `stats:methods` / `stats:symbols` / `stats:time-period` / `stats:profit-curve`
+- 激活：
+  - `activation:getStatus` / `activation:verify`
+- 设置：
+  - `settings:get-data-path` / `settings:set-data-path` / `settings:clear-data-path` / `settings:select-data-path` / `settings:migrate-data`
+
+更详细的入参/出参可参考对应的 `electron/handlers/*.ts` 文件。
+
+---
+
+## 🧩 开发排错小贴士
+
+常见问题及排查步骤：
+
+1. **App 无法启动 / 白屏**
+   - 在终端运行 `npm start`，查看主进程错误日志。
+   - 确认 `better-sqlite3` 已在当前系统上重新编译（`npm run rebuild`）。
+2. **交易/方法页面无数据**
+   - 确认数据库文件存在：
+     - macOS：`~/Library/Application Support/TradingReview/trading.db`
+     - Windows：`%APPDATA%/TradingReview/trading.db`
+   - 终端查看是否有「数据库初始化失败」或 SQL 报错。
+3. **激活失败**
+   - 本地测试：`curl -X POST http://localhost:3001/api/activate ...`
+   - 云服务器：确认安全组放行 3001 端口，`ACTIVATION_SERVER_URL` 指向正确地址。
+4. **CI 构建失败**
+   - 检查 GitHub Actions 日志中 `npm ci` / `npm run rebuild` 步骤。
+   - 确认仓库 Secrets 中已配置 `ACTIVATION_SERVER_URL`。
+
+---
+
+## 📝 变更记录（简要）
+
+完整变更记录请查看 Git 提交历史，以下为关键演进点概览：
+
+- v1.0.0：初始版本，包含方法库、交易记录、统计分析、激活功能。
+- 之后版本：
+  - 增加云激活服务器及本地/云部署文档。
+  - 引入激活服务器地址的 `.env` / GitHub Secrets 配置。
+  - 补充交易筛选（日期范围）、错误信息优化、基础输入校验等。
+
+后续如有重大特性变更，可考虑单独维护 `CHANGELOG.md`。
+
+---
+
 ## 🖥️ 应用架构
 
 ### 主进程 (Main Process)

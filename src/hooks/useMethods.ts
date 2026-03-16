@@ -41,11 +41,16 @@ export const useMethods = () => {
         fetchMethods();
         return response.data;
       } else {
-        message.error("创建失败");
-        throw new Error("创建失败");
+        const msg = response?.message || "创建失败";
+        message.error(msg);
+        throw new Error(msg);
       }
     } catch (error) {
-      message.error("创建失败");
+      if (error instanceof Error) {
+        message.error(error.message || "创建失败");
+      } else {
+        message.error("创建失败");
+      }
       throw error;
     }
   };
@@ -59,11 +64,16 @@ export const useMethods = () => {
         fetchMethods();
         return response.data;
       } else {
-        message.error("更新失败");
-        throw new Error("更新失败");
+        const msg = response?.message || "更新失败";
+        message.error(msg);
+        throw new Error(msg);
       }
     } catch (error) {
-      message.error("更新失败");
+      if (error instanceof Error) {
+        message.error(error.message || "更新失败");
+      } else {
+        message.error("更新失败");
+      }
       throw error;
     }
   };
@@ -76,11 +86,16 @@ export const useMethods = () => {
         message.success("删除成功");
         fetchMethods();
       } else {
-        message.error("删除失败");
-        throw new Error("删除失败");
+        const msg = response?.message || "删除失败";
+        message.error(msg);
+        throw new Error(msg);
       }
     } catch (error) {
-      message.error("删除失败");
+      if (error instanceof Error) {
+        message.error(error.message || "删除失败");
+      } else {
+        message.error("删除失败");
+      }
       throw error;
     }
   };

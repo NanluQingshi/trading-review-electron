@@ -41,13 +41,13 @@
 
 ### 3.3 错误处理
 
-- [ ] 错误信息 - `message.error("创建失败")` 等过于笼统，可展示服务端返回信息
-- [ ] API 错误形态 - 统一处理 `success: false` 及异常情况
-- [ ] 数据库初始化失败 - 当前仅打印日志，可增加用户提示或降级策略
+- [x] 错误信息 - 创建/更新/删除交易和方法时，会优先展示后端返回的 `message`，否则退回通用提示
+- [x] API 错误形态 - hooks 中统一按 `response.success` 判断，`success: false` 时抛出带 message 的错误
+- [ ] 数据库初始化失败 - 当前仅打印日志，可增加用户提示或降级策略（暂未改动）
 
 ### 3.4 性能
 
-- [ ] useStats 串行请求 - 4 个 API 可并行请求
+- [x] useStats 串行请求 - 已改为 `Promise.all` 并行获取统计数据
 - [ ] 交易列表分页 - 后端一次性加载全部，数据量大时考虑分页
 
 ---
@@ -68,9 +68,9 @@
 
 ## 五、安全与健壮性
 
-- [ ] 输入校验 - 对 trade / method 等 payload 做校验
-- [ ] tags JSON 解析 - `JSON.parse(row.tags)` 需 try-catch，防止异常数据
-- [ ] 时区处理 - `entryTime` / `exitTime` 存储与展示的时区策略
+- [x] 输入校验 - 对 trade / method 的关键字段做基础校验（品种、方向、方法代码、名称）
+- [x] tags JSON 解析 - `JSON.parse(row.tags)` 已用 try-catch 包裹，解析失败回退空数组并记录 warning
+- [ ] 时区处理 - `entryTime` / `exitTime` 存储与展示的时区策略（暂未改动）
 
 ---
 
@@ -78,16 +78,16 @@
 
 ### 6.1 文档
 
-- [ ] IPC API 文档 - 各 channel 的入参、出参说明
-- [ ] 开发者排错 - README 中增加常见问题与排查步骤
-- [ ] CHANGELOG - 版本变更记录
-- [ ] 环境变量 - `.env.example` 中补充说明
+- [x] IPC API 文档 - README 中新增主要 IPC 通道与 `window.electron` 映射的简要说明
+- [x] 开发者排错 - README 中增加「开发排错小贴士」章节
+- [x] CHANGELOG - README 中增加关键变更概览（完整记录仍查看 Git 历史）
+- [x] 环境变量 - `.env.example` 中补充 `ACTIVATION_SERVER_URL` 的使用说明
 
 ### 6.2 CI/CD
 
-- [ ] 重复构建步骤 - `.github/workflows/build.yaml` 中 Rebuild 与 Make 各执行两次，可精简
-- [ ] 输出目录 - 确认 `dist/**` 与 `out/**` 是否都需保留
-- [ ] Windows 图标 - `MakerSquirrel` 的 `icon.ico` 在 macOS 构建时可能缺失
+- [x] 重复构建步骤 - `.github/workflows/build.yaml` 中 Rebuild 与 Make 已精简为各执行一次
+- [x] 输出目录 - 仅保留 `out/**` 作为构建产物上传目标
+- [ ] Windows 图标 - `MakerSquirrel` 的 `icon.ico` 在 macOS 构建时可能缺失（保留为后续检查项）
 
 ---
 

@@ -18,21 +18,33 @@ export const useStats = () => {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      // 获取总体统计数据
-      const overallResponse = await statsApi.getStats();
+      // 并行获取统计数据
+      const [
+        overallResponse,
+        methodStatsResponse,
+        symbolStatsResponse,
+        profitCurveResponse,
+      ] = await Promise.all([
+        statsApi.getStats(),
+        statsApi.getMethodStats(),
+        statsApi.getSymbolStats(),
+        statsApi.getProfitCurve(),
+      ]);
+
+      if (!overallResponse.success) {
+        throw new Error(overallResponse.message || "获取总体统计数据失败");
+      }
+
       const overallData = overallResponse.data;
-
-      // 获取方法统计数据
-      const methodStatsResponse = await statsApi.getMethodStats();
-      const methodStatsData = methodStatsResponse.data;
-
-      // 获取货币对统计数据
-      const symbolStatsResponse = await statsApi.getSymbolStats();
-      const symbolStatsData = symbolStatsResponse.data;
-
-      // 获取盈利曲线数据
-      const profitCurveResponse = await statsApi.getProfitCurve();
-      const profitCurveData = profitCurveResponse.data;
+      const methodStatsData = methodStatsResponse.success
+        ? methodStatsResponse.data
+        : [];
+      const symbolStatsData = symbolStatsResponse.success
+        ? symbolStatsResponse.data
+        : [];
+      const profitCurveData = profitCurveResponse.success
+        ? profitCurveResponse.data
+        : [];
 
       // 转换数据格式以匹配前端期望的类型
       const formattedStats: Stats = {

@@ -36,11 +36,20 @@ export const useTrades = () => {
   const createTrade = async (tradeData: Partial<Trade>) => {
     try {
       const response = await tradesApi.createTrade(tradeData);
-      message.success("创建成功");
-      fetchTrades();
-      return response.data;
+      if (response && response.success) {
+        message.success("创建成功");
+        fetchTrades();
+        return response.data;
+      }
+      const msg = response?.message || "创建失败";
+      message.error(msg);
+      throw new Error(msg);
     } catch (error) {
-      message.error("创建失败");
+      if (error instanceof Error) {
+        message.error(error.message || "创建失败");
+      } else {
+        message.error("创建失败");
+      }
       throw error;
     }
   };
@@ -49,11 +58,20 @@ export const useTrades = () => {
   const updateTrade = async (id: number, tradeData: Partial<Trade>) => {
     try {
       const response = await tradesApi.updateTrade(id, tradeData);
-      message.success("更新成功");
-      fetchTrades();
-      return response.data;
+      if (response && response.success) {
+        message.success("更新成功");
+        fetchTrades();
+        return response.data;
+      }
+      const msg = response?.message || "更新失败";
+      message.error(msg);
+      throw new Error(msg);
     } catch (error) {
-      message.error("更新失败");
+      if (error instanceof Error) {
+        message.error(error.message || "更新失败");
+      } else {
+        message.error("更新失败");
+      }
       throw error;
     }
   };
@@ -61,11 +79,21 @@ export const useTrades = () => {
   // 删除交易记录
   const deleteTrade = async (id: number) => {
     try {
-      await tradesApi.deleteTrade(id);
-      message.success("删除成功");
-      fetchTrades();
+      const response = await tradesApi.deleteTrade(id);
+      if (response && response.success) {
+        message.success(response.message || "删除成功");
+        fetchTrades();
+      } else {
+        const msg = response?.message || "删除失败";
+        message.error(msg);
+        throw new Error(msg);
+      }
     } catch (error) {
-      message.error("删除失败");
+      if (error instanceof Error) {
+        message.error(error.message || "删除失败");
+      } else {
+        message.error("删除失败");
+      }
       throw error;
     }
   };

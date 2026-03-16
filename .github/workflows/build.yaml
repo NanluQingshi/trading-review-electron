@@ -46,28 +46,6 @@ jobs:
           # 从 GitHub Secrets 注入激活服务器地址，打包时会写入产物
           ACTIVATION_SERVER_URL: ${{ secrets.ACTIVATION_SERVER_URL }}
 
-      - name: Rebuild Native Modules
-        shell: bash
-        run: |
-          # 尝试自动 rebuild。如果你的 package.json 里有 "rebuild" 脚本则运行它
-          # 如果没有，Forge 通常在 npm install 时会自动处理，或者在 make 时处理
-          # 这里为了保险，显式调用 electron-rebuild (如果没有这个命令，这一步可以删除)
-          npm run rebuild -- --force
-        env:
-          npm_config_runtime: electron
-          npm_config_target: 40.0.0 # 👈 修正3：请务必去 package.json 查看你的 electron 版本并填在这里！！
-          npm_config_disturl: https://electronjs.org/headers
-
-      - name: Make (Build & Package)
-        run: npm run make
-        env:
-          ACTIVATION_SERVER_URL: ${{ secrets.ACTIVATION_SERVER_URL }}
-
-      - name: List Output Files (Debug)
-        shell: bash
-        run: |
-          ls -R out || echo "out directory not found"
-
       - name: Upload Artifacts to Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -78,10 +56,5 @@ jobs:
             dist/**/*.exe
             dist/**/*.rpm
             dist/**/*.deb
-            out/**/*.zip
-            out/**/*.dmg
-            out/**/*.exe
-            out/**/*.rpm
-            out/**/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

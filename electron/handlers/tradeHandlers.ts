@@ -104,11 +104,22 @@ export const getTrades = (filters?: {
 
     const rows = allQuery(query, params);
 
-    // 处理 tags 字段
-    const formattedRows = rows.map((row: any) => ({
-      ...row,
-      tags: typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags,
-    }));
+    // 处理 tags 字段，防止 JSON 解析异常
+    const formattedRows = rows.map((row: any) => {
+      let parsedTags = row.tags;
+      if (typeof row.tags === "string") {
+        try {
+          parsedTags = JSON.parse(row.tags);
+        } catch (e) {
+          console.warn("解析 tags 字段失败，将使用空数组。原始值:", row.tags);
+          parsedTags = [];
+        }
+      }
+      return {
+        ...row,
+        tags: parsedTags,
+      };
+    });
 
     return {
       success: true,
@@ -155,6 +166,14 @@ export const getTrade = (id: number) => {
 // 创建新交易记录
 export const createTrade = (trade: Trade) => {
   try {
+    // 基础输入校验
+    if (!trade.symbol || !trade.direction) {
+      return {
+        success: false,
+        message: "交易品种和方向为必填项",
+      };
+    }
+
     // 使用用户手动输入的盈亏值
     const profit = trade.profit;
 
@@ -210,6 +229,13 @@ export const createTrade = (trade: Trade) => {
 // 更新交易记录
 export const updateTrade = (id: number, trade: Trade) => {
   try {
+    // 基础输入校验
+    if (!trade.symbol || !trade.direction) {
+      return {
+        success: false,
+        message: "交易品种和方向为必填项",
+      };
+    }
     // 使用用户手动输入的盈亏值
     const profit = trade.profit;
 
