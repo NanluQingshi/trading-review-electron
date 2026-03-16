@@ -86,6 +86,9 @@ const createTables = () => {
         FOREIGN KEY (methodId) REFERENCES methods(id) ON DELETE SET NULL
       )
     `);
+
+    // 启用外键约束，确保 ON DELETE SET NULL 等生效
+    db.pragma("foreign_keys = ON");
   } catch (error) {
     console.error("❌ 表结构创建失败:", error);
   }

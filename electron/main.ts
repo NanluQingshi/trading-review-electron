@@ -110,7 +110,8 @@ const registerIpcHandlers = () => {
 
   ipcMain.handle("settings:migrate-data", async (_, newPath) => {
     try {
-      const oldPath = app.getPath("userData");
+      // 使用实际数据路径：自定义路径优先，否则用 userData
+      const oldPath = getDataPath() || app.getPath("userData");
       const oldDbPath = path.join(oldPath, "trading.db");
       const newDbPath = path.join(newPath, "trading.db");
 

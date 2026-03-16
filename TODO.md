@@ -1,0 +1,125 @@
+# TradingReview 项目 TODO
+
+> 本文档记录待完善功能、已知问题及可改进项，按优先级排序。完成一项后将 `[ ]` 改为 `[x]`。
+
+---
+
+## 一、高优先级（Bug / 必备修复）
+
+- [x] **1.1 数据迁移源路径错误** - `electron/main.ts`。修复：使用 `getDataPath() || app.getPath("userData")` 作为实际数据源路径。
+- [x] **1.2 useTrades 响应处理** - `src/hooks/useTrades.ts`。修复：增加 `response.success` 判断，失败时 `setTrades([])`。
+- [x] **1.3 App 启动时 window.electron 未就绪** - `src/App.tsx`。修复：增加 `window.electron` 存在性检查，未就绪时延迟重试。
+- [x] **1.4 SQLite 外键未启用** - `electron/db/instance.ts`。修复：在 `createTables` 后执行 `db.pragma('foreign_keys = ON')`。
+
+---
+
+## 二、中优先级（功能补全）
+
+- [ ] **2.1 截图功能未实现** - `trades` 表有 `screenshot` 字段，但无上传、预览、展示逻辑。在 TradeForm / TradeModal 中实现截图上传、存储与展示。
+- [ ] **2.2 交易筛选缺少日期范围** - 后端支持 `startDate` / `endDate`，前端 `TradesFilter` 无日期选择。增加日期范围选择器并传给 `fetchTrades`。
+- [ ] **2.3 设置页版本号硬编码** - `src/pages/SettingsPage.tsx`。修复：改为 `window.electron.getAppVersion()`。
+- [ ] **2.4 cleanupDirtyMethods 未实现** - `electron/handlers/methodHandlers.ts`。实现脏数据清理逻辑，或移除相关调用。
+
+---
+
+## 三、可改进项（代码质量 / UX）
+
+### 3.1 代码质量
+
+- [ ] `any` 类型 - `electron/preload.ts`、`electron/db/instance.ts`，建议补充具体类型
+- [ ] 废弃 API - `methodHandlers.ts` 中 `substr` 改为 `substring` 或 `slice`
+- [ ] 重复 initDatabase - 各 handler 模块，可考虑统一初始化入口
+
+### 3.2 用户体验
+
+- [ ] 激活失败重试 - 网络失败时提供「重试」按钮
+- [ ] 离线提示 - 无网络时给出明确提示
+- [ ] 批量删除确认 - 交易批量删除前增加确认弹窗
+- [ ] 键盘快捷键 - 新增、保存、取消等常用操作
+- [ ] 加载骨架屏 - 表格、图表加载时使用 skeleton
+- [ ] 空状态引导 - 无数据时给出操作引导
+
+### 3.3 错误处理
+
+- [ ] 错误信息 - `message.error("创建失败")` 等过于笼统，可展示服务端返回信息
+- [ ] API 错误形态 - 统一处理 `success: false` 及异常情况
+- [ ] 数据库初始化失败 - 当前仅打印日志，可增加用户提示或降级策略
+
+### 3.4 性能
+
+- [ ] useStats 串行请求 - 4 个 API 可并行请求
+- [ ] 交易列表分页 - 后端一次性加载全部，数据量大时考虑分页
+
+---
+
+## 四、可新增功能
+
+- [ ] 数据导出 - 导出交易记录 / 统计到 CSV 或 Excel
+- [ ] 数据导入 - 从 CSV 导入交易记录
+- [ ] 数据备份 - 手动或定时备份数据库
+- [ ] 深色模式 - 主题切换
+- [ ] 更多图表 - 按品种、时间等维度的图表
+- [ ] 全局搜索 - 跨交易、策略的搜索
+- [ ] 标签 / 备注 - 富文本备注、标签自动补全
+- [ ] 策略对比 - 多策略并排对比
+- [ ] 交易模板 - 常用交易快速录入模板
+
+---
+
+## 五、安全与健壮性
+
+- [ ] 输入校验 - 对 trade / method 等 payload 做校验
+- [ ] tags JSON 解析 - `JSON.parse(row.tags)` 需 try-catch，防止异常数据
+- [ ] 时区处理 - `entryTime` / `exitTime` 存储与展示的时区策略
+
+---
+
+## 六、文档与工程
+
+### 6.1 文档
+
+- [ ] IPC API 文档 - 各 channel 的入参、出参说明
+- [ ] 开发者排错 - README 中增加常见问题与排查步骤
+- [ ] CHANGELOG - 版本变更记录
+- [ ] 环境变量 - `.env.example` 中补充说明
+
+### 6.2 CI/CD
+
+- [ ] 重复构建步骤 - `.github/workflows/build.yaml` 中 Rebuild 与 Make 各执行两次，可精简
+- [ ] 输出目录 - 确认 `dist/**` 与 `out/**` 是否都需保留
+- [ ] Windows 图标 - `MakerSquirrel` 的 `icon.ico` 在 macOS 构建时可能缺失
+
+---
+
+## 七、测试
+
+- [ ] 单元测试 - 引入 Vitest，为 handlers、hooks、API 层编写基础测试
+- [ ] 集成测试 - 未配置
+- [ ] E2E 测试 - 未配置
+
+---
+
+## 八、国际化与无障碍
+
+- [ ] i18n - 当前全中文，如需多语言可引入 react-i18next
+- [ ] ARIA / 键盘导航 - 关键流程增加无障碍支持
+- [ ] 屏幕阅读器支持 - 未实现
+
+---
+
+## 九、日志
+
+- [ ] 结构化日志 - 使用 electron-log 等，支持按级别输出
+- [ ] 日志级别 - 未实现
+- [ ] 用户可查看日志 - 可选日志查看界面
+
+---
+
+## 优先级速查
+
+| 优先级 | 项目 |
+|--------|------|
+| P0 | 数据迁移源路径、useTrades 响应、window.electron 检查、SQLite 外键 |
+| P1 | 截图功能、日期筛选、设置页版本、cleanupDirtyMethods |
+| P2 | 错误提示、批量删除确认、激活重试、性能优化 |
+| P3 | 数据导出/导入、深色模式、测试、文档 |

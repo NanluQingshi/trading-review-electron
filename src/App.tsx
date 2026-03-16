@@ -138,7 +138,20 @@ const App: React.FC = () => {
   const [activated, setActivated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    window.electron.activation.getStatus().then(setActivated);
+    const checkActivation = async () => {
+      if (!window.electron?.activation) {
+        // preload 未就绪，延迟重试
+        setTimeout(checkActivation, 100);
+        return;
+      }
+      try {
+        const isActivated = await window.electron.activation.getStatus();
+        setActivated(isActivated);
+      } catch {
+        setActivated(false);
+      }
+    };
+    checkActivation();
   }, []);
 
   const handleActivated = () => {

@@ -19,9 +19,14 @@ export const useTrades = () => {
     setLoading(true);
     try {
       const response = await tradesApi.getTrades(params);
-      setTrades(response.data);
+      setTrades(
+        response.success && Array.isArray(response.data)
+          ? response.data
+          : [],
+      );
     } catch (error) {
       message.error("获取交易记录失败");
+      setTrades([]);
     } finally {
       setLoading(false);
     }
