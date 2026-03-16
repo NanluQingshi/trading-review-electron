@@ -26,9 +26,9 @@
 
 ### 3.1 代码质量
 
-- [ ] `any` 类型 - `electron/preload.ts`、`electron/db/instance.ts`，建议补充具体类型
-- [ ] 废弃 API - `methodHandlers.ts` 中 `substr` 改为 `substring` 或 `slice`
-- [ ] 重复 initDatabase - 各 handler 模块，可考虑统一初始化入口
+- [x] `any` 类型 - `electron/db/instance.ts` 已增加最小 `BetterSqliteDatabase` 类型封装（preload 的 any 保留作为 IPC 边界）。
+- [x] 废弃 API - `methodHandlers.ts` 中 `substr` 已改为 `slice`。
+- [ ] 重复 initDatabase - 各 handler 模块，可考虑统一初始化入口（暂未改动，仅保留为后续优化项）。
 
 ### 3.2 用户体验
 

@@ -60,7 +60,7 @@ export const createMethod = (method: Method) => {
   try {
     const id =
       method.id ||
-      `method_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      `method_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     runQuery(
       "INSERT INTO methods (id, code, name, description, is_default, usage_count, win_rate, total_pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [

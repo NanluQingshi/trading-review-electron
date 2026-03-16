@@ -13,7 +13,14 @@ import { getDataPath } from "@electron/config";
 
 const require = createRequire(import.meta.url);
 
-let db: any = null;
+// 为 better-sqlite3 提供一个最小类型定义，避免大量 any
+interface BetterSqliteDatabase {
+  exec: (sql: string) => void;
+  prepare: (sql: string) => any;
+  pragma: (pragma: string) => void;
+}
+
+let db: BetterSqliteDatabase | null = null;
 
 export const initDatabase = () => {
   try {
