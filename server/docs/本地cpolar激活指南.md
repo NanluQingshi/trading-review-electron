@@ -94,6 +94,8 @@ curl -X POST http://你的cpolar地址.cpolar.top/api/activate \
 
 ### 步骤 4：打包 App
 
+**打包前确认** `.env` 中已配置 cpolar 地址（步骤 3），该值会写入打包产物。
+
 在项目根目录执行：
 
 ```bash
