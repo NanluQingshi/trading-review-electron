@@ -7,7 +7,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layout, Menu, ConfigProvider, Spin } from 'antd';
+import { Layout, Menu, ConfigProvider, Spin, Alert } from 'antd';
 import { 
   BookOutlined, 
   LineChartOutlined, 
@@ -37,9 +37,7 @@ const AppContent: React.FC = () => {
     if (path === '/settings') return 'settings';
     return 'methods';
   };
-
-
-
+  
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
@@ -136,6 +134,7 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   const [activated, setActivated] = useState<boolean | null>(null);
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
   useEffect(() => {
     const checkActivation = async () => {
@@ -152,6 +151,20 @@ const App: React.FC = () => {
       }
     };
     checkActivation();
+  }, []);
+
+  // 监听在线/离线状态，给出全局提示
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   const handleActivated = () => {
@@ -186,12 +199,23 @@ const App: React.FC = () => {
           },
         }}
       >
-        <ActivationPage onActivated={handleActivated} />
+        <>
+          {!isOnline && (
+            <div style={{ padding: 16 }}>
+              <Alert
+                type="warning"
+                message="当前处于离线状态，激活功能需要联网，请检查网络后重试。"
+                showIcon
+              />
+            </div>
+          )}
+          <ActivationPage onActivated={handleActivated} />
+        </>
       </ConfigProvider>
     );
   }
 
-  // 已激活，显示主应用
+  // 已激活，显示主应用（本地使用为主，不再全局提示离线，仅在激活页提示）
   return (
     <ConfigProvider
       theme={{

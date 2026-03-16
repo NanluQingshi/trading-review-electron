@@ -14,6 +14,7 @@ interface ActivationPageProps {
 
 const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
   const [loading, setLoading] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
   const [form] = Form.useForm();
 
   const handleSubmit = async () => {
@@ -23,9 +24,14 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
       const result = await window.electron.activation.verify(values.code);
       if (result.success) {
         message.success(result.message);
+        setNetworkError(false);
         onActivated();
       } else {
         message.error(result.message);
+        setNetworkError(
+          typeof result.message === 'string' &&
+          result.message.includes('网络连接失败'),
+        );
       }
     } catch (error) {
       // 表单校验失败
@@ -33,6 +39,7 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
         return;
       }
       message.error('激活失败，请重试');
+      setNetworkError(true);
     } finally {
       setLoading(false);
     }
@@ -93,15 +100,28 @@ const ActivationPage: React.FC<ActivationPageProps> = ({ onActivated }) => {
             </Form.Item>
 
             <Form.Item style={{ marginBottom: 0 }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                size="large"
-                block
-              >
-                激活
-              </Button>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  size="large"
+                  block
+                >
+                  激活
+                </Button>
+                {networkError && (
+                  <Button
+                    size="small"
+                    type="dashed"
+                    block
+                    disabled={loading}
+                    onClick={handleSubmit}
+                  >
+                    网络恢复后，点击此处重试激活
+                  </Button>
+                )}
+              </Space>
             </Form.Item>
           </Form>
 

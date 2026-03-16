@@ -5,7 +5,7 @@
  * @LastEditTime: 2026-02-06 21:31:11
  * @Description: 
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form } from 'antd';
 import dayjs from 'dayjs';
 import { Method, Trade } from '@/types';
@@ -65,6 +65,25 @@ const TradeModal: React.FC<TradeModalProps> = ({
       console.error('Validate Failed:', error);
     }
   };
+
+  // 键盘快捷键：Enter 提交，Esc 取消
+  useEffect(() => {
+    if (!visible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleCancel();
+      }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        handleOk();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [visible]);
 
   return (
     <Modal

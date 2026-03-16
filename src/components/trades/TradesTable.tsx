@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Space, Tag, Typography, Divider, Button, Tooltip } from 'antd';
+import { Table, Space, Tag, Typography, Divider, Button, Tooltip, Empty, Skeleton } from 'antd';
 import { EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { Trade } from '@/types';
@@ -137,6 +137,28 @@ const TradesTable: React.FC<TradesTableProps> = ({
       ),
     },
   ];
+
+  if (loading && trades.length === 0) {
+    return (
+      <div style={{ padding: 24 }}>
+        <Skeleton active paragraph={{ rows: 6 }} />
+      </div>
+    );
+  }
+
+  if (!loading && trades.length === 0) {
+    return (
+      <div style={{ padding: 48 }}>
+        <Empty
+          description={
+            <span>
+              暂无交易记录，点击上方「新增交易」按钮开始记录你的第一笔交易。
+            </span>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <Table 

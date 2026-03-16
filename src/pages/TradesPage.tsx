@@ -72,7 +72,7 @@ const TradesPage: React.FC = () => {
     });
   };
 
-  // 批量删除交易
+  // 批量删除交易（具体确认弹窗在 TradesHeader 中通过 Popconfirm 处理）
   const handleBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
       message.warning('请选择要删除的交易记录');
